@@ -197,7 +197,19 @@ body {
 <div class="sidebar" id="sidebar">
     
     <div class="sidebar-header">
+@if(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "admin")
         Admin
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "manager")
+Manager
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "accountant")
+Accountant
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "driver")
+Driver
+
+
+
+
+@endif
     </div>
 
     {{-- @php
@@ -230,7 +242,7 @@ body {
 <a href="{{ route('payments.index') }}" class="">
     <i class="bi bi-door-open-fill"></i> <span>Payments info</span>
 </a>
-<a href="{{ route('verify') }}" class="">
+<a href="#" class="">
     <i class="bi bi-gear"></i> <span>Setting</span>
 </a>
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "manager")
@@ -241,9 +253,9 @@ body {
     <i class="bi bi-door-open-fill"></i> <span>Registration</span>
 </a>
 <a href="{{ route('userRequest.index') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>User Request</span>
+    <i class="bi bi-door-open-fill"></i> <span>Make Request</span>
 </a>
-<a href="" class="">
+<a href="#" class="">
     <i class="bi bi-gear"></i> <span>Setting</span>
 </a>
 
@@ -290,7 +302,7 @@ body {
 <a href="{{ route('fuelManagers.index') }}" class="">
     <i class="bi bi-person-lines-fill"></i> <span>Report</span>
 </a>
-<a href="{{ route('fuelManagers.index') }}" class="">
+<a href="#" class="">
     <i class="bi bi-person-lines-fill"></i> <span>Setting</span>
 </a>
 @elseif(Auth::guard('manager')->check() && Auth::guard('manager')->user()->role == "attendant")
@@ -301,7 +313,7 @@ body {
     <i class="bi bi-door-open-fill"></i> <span>Scanning vouchar</span>
 </a>
 
-<a href="" class="">
+<a href="#" class="">
     <i class="bi bi-gear"></i> <span>Setting</span>
 </a>
 

@@ -10,7 +10,7 @@ class FuelManager extends Authenticatable
 {
     use HasFactory;
 
-    protected $table = 'fuel_managers'; 
+    protected $table = 'fuel_workers'; 
 
     protected $fillable = [
         'firstname',

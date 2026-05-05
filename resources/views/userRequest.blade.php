@@ -95,8 +95,8 @@
             <th>User</th>
             <th>Amount</th>
             <th>Litre(s)</th>
-            <th>Status</th>
             <th>Date of requested</th>
+            <th>Status</th>
             @if(Auth::guard('web')->user()->role=="admin")
             <th>Action</th>
             @endif

@@ -30,7 +30,7 @@ class FuelManagerController extends Controller
             'lastname'   => 'required',
             'mobile'     => 'required',
             'role'    => 'required',
-            'email'      => 'required|email|unique:fuel_managers,email',
+            'email'      => 'required|email|unique:fuel_workers,email',
             'password'   => 'required|min:4',
             'station_id' => 'required|exists:stations,id',
         ]);

@@ -46,7 +46,7 @@ class PaymentController extends Controller
         'verified_by'       => 2, // badilisha baadae na auth
     ]);
 
-    // 🔥 CREATE VOUCHER
+    
     Voucher::create([
         'request_id'   => $payment->request_id,
         'voucher_code' => strtoupper(Str::random(10)),

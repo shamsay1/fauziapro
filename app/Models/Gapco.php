@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Gapco extends Model
 {
+    protected $table = 'organizations';
     protected $fillable = [
         'company_name',
         'type'

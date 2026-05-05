@@ -9,7 +9,7 @@ class GapcoController extends Controller
 {
     public function index()
     {
-        $gapcos = Gapco::latest()->get();
+        $gapcos = Gapco::where('id','>',1)->latest()->get();
 
         return view('organization', compact('gapcos'));
     }

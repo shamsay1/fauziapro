@@ -24,7 +24,7 @@ class SystemUserController extends Controller
         $users = SystemUser::with('organization')->latest()->where("role","accountant")->orWhere('role','driver')->get();
 
         }
-        $organizations = Gapco::all();
+        $organizations = Gapco::where('id','>',1)->latest()->get();
 
         return view('organizationManager', compact('users', 'organizations'));
     }
@@ -39,7 +39,7 @@ class SystemUserController extends Controller
             'email'           => 'required|email|unique:system_users,email',
             'password'        => 'required|min:4',
             'role'            => 'required',
-            'organization_id' => 'required|exists:gapcos,id',
+            'organization_id' => 'required|exists:organizations,id',
         ]);
 
         SystemUser::create([
@@ -66,7 +66,6 @@ class SystemUserController extends Controller
             'mobile'          => 'required',
             'email'           => 'required|email|unique:system_users,email,' . $id,
             'role'            => 'required',
-            'organization_id' => 'required|exists:gapcos,id',
         ]);
 
         $data = [
