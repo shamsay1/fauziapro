@@ -113,7 +113,7 @@
         <div class="col-md-6">
             <div class="info-box">
                 <b>Verify By</b><br>
-                {{ $v->voucher_verify->firstname }} {{ $v->voucher_verify->lastname }}
+                {{ $v->voucher_verify->first_name }} {{ $v->voucher_verify->last_name }}
             </div>
         </div>
     </div>

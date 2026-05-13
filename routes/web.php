@@ -23,7 +23,7 @@ Route::resource('payments', PaymentController::class);
 Route::post('/payments/verify/{id}', [PaymentController::class, 'verify'])->name('payments.verify');
 Route::get('/vouchers', [SystemUserController::class, 'index'])->name('vouchers.index');
 Route::get('/vouchers', [SystemUserController::class, 'show'])->name('vouchers.show');
-
+Route::get('/users_all',[SystemUserController::class,"index1"])->name("index1");
 Route::post('/vouchers/generate', [SystemUserController::class, 'generate'])
     ->name('vouchers.generate');
 Route::get('/generated',[SystemUserController::class,"generated"])->name('generated');
@@ -31,3 +31,9 @@ Route::get('/verify',[SystemUserController::class,"showverify"])->name('verify')
 Route::post('/voucher/verify', [SystemUserController::class, 'verifyVoucher'])->name('voucher.verify');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/expired',[SystemUserController::class,"expired"])->name("expired");
+Route::put('/request/toggle-status/{id}', [UserRequestController::class, 'toggleStatus'])
+    ->name('request.toggleStatus');
+Route::get("/forgot",[AdminController::class,"forgot"])->name("forgot");
+Route::post('/forgot-password', [AdminController::class, 'sendResetLink'])->name('password.email');
+Route::get('/reset-password/{token}', [AdminController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AdminController::class, 'updatePassword'])->name('password.update');

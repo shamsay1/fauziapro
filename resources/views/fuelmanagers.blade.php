@@ -82,25 +82,16 @@
                             <label for="">Password</label>
                             <input type="password" name="password" class="form-control" placeholder="Password" value="12345">
                         </div>
-                  @if(Auth::guard('manager')->check() && Auth::guard('manager')->user()->role=="station_manager")
-                  <input type="hidden" name="station_id" value="{{ Auth::guard('manager')->user()->station_id }}">
-                  <input type="hidden" name="role" value="attendant">
-                  @else
+                 
                         <div class="col-md-6 mb-2">
-                            <label for="">Station</label>
-                            <select name="station_id" class="form-control" required>
-                                <option value="">Select Station</option>
-                                @foreach($stations as $station)
-                                    <option value="{{ $station->id }}">
-                                        {{ $station->station_name }}
+                            <label for="">Select role</label>
+                            <select name="role" class="form-control" required>
+                                <option value="">Select role</option>
+                                    <option value="attendant">
+                                        Fuel Attendant
                                     </option>
-                                @endforeach
                             </select>
                         </div>
-                    @endif
-                     @if(Auth::guard('web')->check() && Auth::guard('web')->user()->role=="admin")
-                  <input type="hidden" name="role" value="station_manager">
-                  @endif
                     </div>
 
                 </div>
@@ -119,7 +110,7 @@
 <div class="alert alert-dismissible fade show flash-message" role="alert">
   <div class="d-flex align-items-center">
     <i class="bi bi-check-circle-fill me-2"></i> <div class="flex-grow-1">
-      <h6 class="alert-heading mb-1">Guest Information</h6>
+      <h6 class="alert-heading mb-1">Staff Information</h6>
       <p class="mb-0" style="color: green">{{ session('success') }}</p>
     </div>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

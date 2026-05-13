@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FuelManager;
 use App\Models\Staff;
 use App\Models\Station;
+use App\Models\SystemUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -13,10 +14,10 @@ class FuelManagerController extends Controller
 {
     public function index()
     {
-        if(Auth::guard('manager')->check() && Auth::guard('manager')->user()->role=="station_manager"){
-        $staff = FuelManager::with('station')->latest()->where('role','attendant')->where('station_id',Auth::guard('manager')->user()->station_id)->get();
+        if(Auth::guard('web')->check() && Auth::guard('web')->user()->role=="station_manager"){
+        $staff = SystemUser::with('station')->latest()->where('role','attendant')->where('station_id',Auth::guard('web')->user()->station_id)->get();
         }else{
-        $staff = FuelManager::with('station')->latest()->where('role','station_manager')->get();
+        $staff = SystemUser::with('station')->latest()->where('role','station_manager')->get();
 
         }
         $stations = Station::all(); 
@@ -24,29 +25,41 @@ class FuelManagerController extends Controller
         return view('fuelmanagers', compact('staff', 'stations'));
     }
     public function store(Request $request)
-    {
-        $request->validate([
-            'firstname'  => 'required',
-            'lastname'   => 'required',
-            'mobile'     => 'required',
-            'role'    => 'required',
-            'email'      => 'required|email|unique:fuel_workers,email',
-            'password'   => 'required|min:4',
-            'station_id' => 'required|exists:stations,id',
-        ]);
+{
+    $request->validate([
+        'firstname' => 'required',
+        'lastname'  => 'required',
+        'mobile'    => 'required',
+        'role'      => 'required',
+        'email'     => 'required|email|unique:system_users,email',
+        'password'  => 'required|min:4',
+    ]);
 
-        FuelManager::create([
-            'firstname'  => $request->firstname,
-            'lastname'   => $request->lastname,
-            'mobile'     => $request->mobile,
-            'email'      => $request->email,
-            'role'       => $request->role, 
-            'password'   => Hash::make($request->password),
-            'station_id' => $request->station_id,
-        ]);
+    SystemUser::create([
 
-        return back()->with('success', 'Staff added successfully');
-    }
+        'first_name' => $request->firstname,
+
+        'last_name' => $request->lastname,
+
+        'mobile' => $request->mobile,
+
+        'email' => $request->email,
+
+        'role' => $request->role,
+
+        'organization_id' => 1,
+
+        'station_id' => Auth::guard('web')->user()->station_id,
+
+        'password' => Hash::make($request->password),
+
+    ]);
+
+    return back()->with(
+        'success',
+        'Staff added successfully'
+    );
+}
 
    
     public function update(Request $request, $id)

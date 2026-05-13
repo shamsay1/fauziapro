@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fuel Vouchar Management System</title>
+    <title>Hotel Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap -->
@@ -12,19 +12,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        
         body {
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', sans-serif;
-            background-image: url("{{ asset('images/image2.jpeg') }}");
-            
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh;
+
+            /* HOTEL STYLE BACKGROUND */
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
         }
 
         .login-card {
@@ -84,48 +80,46 @@
 <body>
 
 <div class="login-card">
-   
     
-    <h4 class="login-title text-center" style="font-size: 19px">
-        Fuel Vouchar Management System
+    <h4 class="login-title text-center">
+        Hotel Reservation <br> Management System
     </h4>
 
     <p class="text-center text-muted mb-3" style="font-size: 14px;">
-        Enter your credentials to login
+        Create New password to login
     </p>
 
-    <form action="{{ route('login') }}" method="post">
+    <form action="{{ route('password.update') }}" method="post">
        @csrf
-        <!-- Email -->
-        <div class="mb-3 input-group">
-            <span class="input-group-text">
-                <i class="bi bi-envelope"></i>
-            </span>
-            <input type="email" name="email" class="form-control" placeholder="Enter email" required>
-        </div>
 
-        <!-- Password -->
-        <div class="mb-2 input-group">
+     
+      <input type="hidden" name="token" value="{{ $token }}">
+       <input type="hidden" name="email" value="{{ $email }}">
+       <div class="mb-2 input-group">
             <span class="input-group-text">
                 <i class="bi bi-lock"></i>
             </span>
-            <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
+            <input type="password" name="password" id="password" class="form-control" placeholder="Create New password" required>
             <span class="input-group-text toggle-password" onclick="togglePassword()">
                 <i class="bi bi-eye" id="eyeIcon"></i>
             </span>
         </div>
 
-        <!-- Forgot password -->
-        <div class="text-end mb-3">
-            <a href="{{ route('forgot') }}" style="font-size: 13px; text-decoration: none;">
-                Forgot password?
-            </a>
+        <div class="mb-2 input-group">
+            <span class="input-group-text">
+                <i class="bi bi-lock"></i>
+            </span>
+            <input type="password" name="password_confirmation" id="password" class="form-control" placeholder="Confirm password" required>
+            <span class="input-group-text toggle-password" onclick="togglePassword()">
+                <i class="bi bi-eye" id="eyeIcon"></i>
+            </span>
         </div>
-
+        
         <!-- Button -->
         <button type="submit" class="btn btn-login w-100">
-            Login
+            Change password
         </button>
+        
         @if(session("error"))
             <span style="color: red">{{ session("error") }}</span>
         @endif
@@ -133,7 +127,6 @@
     </form>
 
 </div>
-
 <script>
 function togglePassword() {
     let password = document.getElementById("password");
@@ -150,6 +143,7 @@ function togglePassword() {
     }
 }
 </script>
+
 
 </body>
 </html>

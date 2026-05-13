@@ -30,7 +30,7 @@
 <div class="table-container">
 
 <!-- BUTTON -->
-@if(Auth::guard('manager')->user()->role=="attendant")
+@if(Auth::guard('web')->user()->role=="attendant")
 
 <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#verifyModal">
     <i class="bi bi-check-circle"></i> Verify Voucher
@@ -85,8 +85,9 @@
   </div>
 </div>
 <!-- TABLE -->
-<table class="table table-bordered table-sm">
-    <thead>
+<table class="table table-bordered table-sm align-middle">
+
+    <thead class="table table-dark">
         <tr>
             <th>#</th>
             <th>Reference</th>
@@ -95,7 +96,7 @@
             <th>Amount</th>
             <th>Status</th>
             <th>Date</th>
-            @if(Auth::guard('manager')->user()->role=="station_manager")
+            @if(Auth::guard('web')->user()->role=="station_manager")
             <th>Verified By</th>
             @endif
         </tr>
@@ -116,8 +117,8 @@
                 </span>
             </td>
             <td>{{ $v->created_at->format('j F Y') }}</td>
-            @if(Auth::guard('manager')->user()->role=="station_manager")
-            <td>{{ $v->voucher_verify->firstname ?? 'N/A' }} {{ $v->voucher_verify->lastname ?? 'N/A' }}</td>
+            @if(Auth::guard('web')->user()->role=="station_manager")
+            <td>{{ $v->voucher_verify->first_name ?? 'N/A' }} {{ $v->voucher_verify->last_name ?? 'N/A' }}</td>
             @endif
         </tr>
         @empty

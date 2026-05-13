@@ -49,10 +49,10 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>User</th>
+            <th>Organization</th>
             <th>Requested Amount</th>
             <th>Paid Amount</th>
-            <th>Status</th>
+            <th>Payment Status</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -62,8 +62,7 @@
         <tr>
             <td>{{ $index + 1 }}</td>
             <td>
-                {{ $pay->request->user->first_name ?? '' }}
-                {{ $pay->request->user->last_name ?? '' }}
+                {{ $pay->request->user->organization->company_name ?? '' }}
             </td>
 
             <td>{{ $pay->request->request_amount }}</td>
@@ -71,9 +70,9 @@
 
             <td>
                 @if($pay->status == 'pending')
-                    <span class="badge bg-warning">Pending</span>
+                    <span class="badge bg-warning">Not paid</span>
                 @else
-                    <span class="badge bg-success">Confirmed</span>
+                    <span class="badge bg-success">Paid</span>
                 @endif
             </td>
 

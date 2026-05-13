@@ -12,8 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        
-        body {
+       body {
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -84,17 +83,16 @@
 <body>
 
 <div class="login-card">
-   
     
-    <h4 class="login-title text-center" style="font-size: 19px">
+    <h4 style="font-size:19px">
         Fuel Vouchar Management System
     </h4>
 
     <p class="text-center text-muted mb-3" style="font-size: 14px;">
-        Enter your credentials to login
+        Enter your email to reset the password
     </p>
 
-    <form action="{{ route('login') }}" method="post">
+    <form action="{{ route('password.email') }}" method="post">
        @csrf
         <!-- Email -->
         <div class="mb-3 input-group">
@@ -104,52 +102,27 @@
             <input type="email" name="email" class="form-control" placeholder="Enter email" required>
         </div>
 
-        <!-- Password -->
-        <div class="mb-2 input-group">
-            <span class="input-group-text">
-                <i class="bi bi-lock"></i>
-            </span>
-            <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
-            <span class="input-group-text toggle-password" onclick="togglePassword()">
-                <i class="bi bi-eye" id="eyeIcon"></i>
-            </span>
-        </div>
-
         <!-- Forgot password -->
-        <div class="text-end mb-3">
-            <a href="{{ route('forgot') }}" style="font-size: 13px; text-decoration: none;">
-                Forgot password?
-            </a>
-        </div>
+        
 
         <!-- Button -->
-        <button type="submit" class="btn btn-login w-100">
-            Login
-        </button>
-        @if(session("error"))
-            <span style="color: red">{{ session("error") }}</span>
+        @if(session("success"))
+            <span style="color: green">{{ session("success") }}</span>
         @endif
+        <button type="submit" class="btn btn-login w-100">
+            Send Link
+        </button>
+        <div class="text-center mb-3 mt-3">
+            <a href="{{ route('login1') }}" style="font-size: 13px; text-decoration: none;">
+                Back to login
+            </a>
+        </div>
+        
 
     </form>
 
 </div>
 
-<script>
-function togglePassword() {
-    let password = document.getElementById("password");
-    let icon = document.getElementById("eyeIcon");
-
-    if (password.type === "password") {
-        password.type = "text";
-        icon.classList.remove("bi-eye");
-        icon.classList.add("bi-eye-slash");
-    } else {
-        password.type = "password";
-        icon.classList.remove("bi-eye-slash");
-        icon.classList.add("bi-eye");
-    }
-}
-</script>
 
 </body>
 </html>

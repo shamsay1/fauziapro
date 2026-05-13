@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gapco;
+use App\Models\Station;
 use App\Models\SystemUser;
 use App\Models\Voucher;
 use App\Models\VoucherAssignment;
@@ -16,18 +17,87 @@ use Illuminate\Support\Facades\Auth;
 
 class SystemUserController extends Controller
 {
-        public function index()
-    {  
-        if(Auth::guard('web')->user()->role=="admin"){
-        $users = SystemUser::with('organization')->latest()->where("role","manager")->get();
-        }elseif(Auth::guard('web')->user()->role=="manager"){
-        $users = SystemUser::with('organization')->latest()->where("role","accountant")->orWhere('role','driver')->get();
+       public function index(Request $request)
+{
+    $query = SystemUser::with(['organization', 'station']);
 
-        }
-        $organizations = Gapco::where('id','>',1)->latest()->get();
+    // ADMIN
+    if (Auth::guard('web')->user()->role == "admin") {
 
-        return view('organizationManager', compact('users', 'organizations'));
+        $query->where('role', '!=', 'admin');
+
     }
+
+    // MANAGER
+    elseif (Auth::guard('web')->user()->role == "manager") {
+
+        $query->where(function ($q) {
+
+            $q->where('role', 'accountant')
+              ->orWhere('role', 'driver');
+
+        })
+        ->where(
+            'organization_id',
+            Auth::guard('web')->user()->organization_id
+        );
+    }
+
+    
+    if ($request->filled('role')) {
+
+        $query->where('role', $request->role);
+
+    }
+
+    // ORGANIZATION FILTER
+    if ($request->filled('organization_id')) {
+
+        $query->where(
+            'organization_id',
+            $request->organization_id
+        );
+
+    }
+
+    // STATION FILTER
+    if ($request->filled('station_id')) {
+
+        $query->where(
+            'station_id',
+            $request->station_id
+        );
+
+    }
+
+  
+    if (
+        !$request->filled('role') &&
+        !$request->filled('organization_id') &&
+        !$request->filled('station_id')
+    ) {
+
+        $users = collect();
+
+    } else {
+
+        $users = $query->latest()->get();
+
+    }
+
+    $organizations = Gapco::orderBy('company_name')->get();
+
+    $stations = Station::orderBy('station_name')->get();
+
+    return view(
+        'organizationManager',
+        compact(
+            'users',
+            'organizations',
+            'stations'
+        )
+    );
+}
 
     
     public function store(Request $request)
@@ -49,6 +119,7 @@ class SystemUserController extends Controller
             'email'           => $request->email,
             'password'        => Hash::make($request->password),
             'role'            => $request->role,
+            'station_id'      => $request->station_id,
             'organization_id' => $request->organization_id,
         ]);
 
@@ -88,9 +159,13 @@ class SystemUserController extends Controller
     } 
     public function show()
 {
-    $users = SystemUser::all();
-    $vouchers = Voucher::with(['request.user.organization'])->latest()->get();
-
+    $users = SystemUser::where('role','driver')->where('organization_id',Auth::guard('web')->user()->organization_id)->get();
+    $vouchers = Voucher::with(['request.user.organization'])
+    ->whereHas('request.user', function($query){
+        $query->where('organization_id', Auth::guard('web')->user()->organization_id);
+    })
+    ->latest()
+    ->get();
     return view('voucher', compact('vouchers','users'));
 }
 
@@ -101,7 +176,15 @@ class SystemUserController extends Controller
         'amount' => 'required|numeric|min:1'
     ]);
 
-    $voucher = Voucher::where('status', 'unused')->first();
+    $voucher = Voucher::whereHas('request.user', function ($query) {
+        $query->where(
+            'organization_id',
+            Auth::guard('web')->user()->organization_id
+        );
+    })
+    ->where('status', 'unused')
+    ->latest()
+    ->first();
 
     if (!$voucher || $voucher->amount < $request->amount) {
         return back()->with('error', 'Voucher haitoshi');
@@ -149,7 +232,7 @@ class SystemUserController extends Controller
     $request->validate([
         'reference_number' => 'required'
     ]);
-    $user = Auth::guard('manager')->user();
+    $user = Auth::guard('web')->user();
     $voucher = VoucherAssignment::where('reference_number', $request->reference_number)->first();
 
     if (!$voucher) {
@@ -171,5 +254,25 @@ class SystemUserController extends Controller
                 ->where("status","expired")
                 ->get();
         return view("verify_voucher",compact('vouchers'));
+    }
+
+
+     public function index1()
+    {  
+        if(Auth::guard('web')->user()->role=="admin"){
+        $users = SystemUser::with('organization')->latest()->where('role','!=','admin')->get();
+        }elseif(Auth::guard('web')->user()->role=="manager"){
+        $users = SystemUser::with('organization')
+    ->where(function($query){
+        $query->where('role', 'accountant')
+              ->orWhere('role', 'driver');
+    })
+    ->where('organization_id', Auth::guard('web')->user()->organization_id)
+    ->get();
+        }
+        $organizations = Gapco::orderBy('id')->get();
+        $stations = Station::all();
+
+        return view('testing', compact('users', 'organizations','stations'));
     }
 }

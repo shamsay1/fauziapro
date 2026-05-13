@@ -103,8 +103,8 @@ body {
     margin-left: 70px;
 }
 
-/* ================= CARDS ================= */
-.card-custom {
+
+.card-custom{
     border-radius: 12px;
     padding: 15px;
     background: #fff;
@@ -126,11 +126,11 @@ body {
     font-weight: bold;
 }
 
-/* ================= GRID ================= */
 .five-cols {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    width: 100%;
 }
 
 /* Tablet */
@@ -205,6 +205,11 @@ Manager
 Accountant
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "driver")
 Driver
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "station_manager")
+Station Manager
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "attendant")
+Fuel attendant
+
 
 
 
@@ -212,111 +217,255 @@ Driver
 @endif
     </div>
 
-    {{-- @php
-    $current = Route::currentRouteName();
-@endphp --}}
+    
 
 @if(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "admin")
-<a href="/dashboard" class="active">
-    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
 </a>
 
-<a href="{{ route('stations.index') }}" class="">
-    <i class="bi bi-people-fill"></i> <span>Stations Info</span>
+<a href="{{ route('stations.index') }}"
+   class="{{ request()->routeIs('stations.*') ? 'active' : '' }}">
+
+    <i class="bi bi-fuel-pump-fill"></i>
+    <span>Manage Stations</span>
+
 </a>
-<a href="{{ route('gapcos.index') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Organizations</span>
+
+<a href="{{ route('gapcos.index') }}"
+   class="{{ request()->routeIs('gapcos.*') ? 'active' : '' }}">
+
+    <i class="bi bi-buildings-fill"></i>
+    <span>Manage Organizations</span>
+
 </a>
-<a href="{{ route('users.index') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Customers</span>
+
+<a href="{{ route('users.index') }}"
+   class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
+
+    <i class="bi bi-people-fill"></i>
+    <span>Manage Users</span>
+
 </a>
-<a href="{{ route('fuelManagers.index') }}" class="">
-    <i class="bi bi-person-lines-fill"></i> <span>Fuel Managers</span>
+
+<a href="{{ route('userRequest.index') }}"
+   class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
+
+    <i class="bi bi-journal-text"></i>
+    <span>User Requests</span>
+
+</a>
+
+<a href="{{ route('payments.index') }}"
+   class="{{ request()->routeIs('payments.*') ? 'active' : '' }}">
+
+    <i class="bi bi-cash-stack"></i>
+    <span>Payments Info</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-bar-chart-line-fill"></i>
+    <span>Reports</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
 </a>
 
 
 
-<a href="{{ route('userRequest.index') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>User Request</span>
-</a>
-<a href="{{ route('payments.index') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Payments info</span>
-</a>
-<a href="#" class="">
-    <i class="bi bi-gear"></i> <span>Setting</span>
-</a>
+
+
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "manager")
-<a href="/dashboard" class="active">
-    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-</a>
-<a href="{{ route('users.index') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Registration</span>
-</a>
-<a href="{{ route('userRequest.index') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Make Request</span>
-</a>
-<a href="#" class="">
-    <i class="bi bi-gear"></i> <span>Setting</span>
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
 </a>
 
-{{-- <a href="{{ route('vouchers.show') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Vouchers Info</span>
+<a href="{{ route('index1') }}"
+   class="">
+
+    <i class="bi bi-person-plus-fill"></i>
+    <span>Registration</span>
+
 </a>
-<a href="{{ route('verify') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Vouchers verify</span>
-</a> --}}
+
+<a href="{{ route('userRequest.index') }}"
+   class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
+
+    <i class="bi bi-file-earmark-plus-fill"></i>
+    <span>Make Request</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
+</a>
+
+
+
+
+
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "accountant")
-<a href="/dashboard" class="active">
-    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-</a>
-<a href="{{ route('vouchers.show') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Vouchers Info</span>
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
 </a>
 
-<a href="" class="">
-    <i class="bi bi-gear"></i> <span>Setting</span>
+<a href="{{ route('vouchers.show') }}"
+   class="{{ request()->routeIs('vouchers.*') ? 'active' : '' }}">
+
+    <i class="bi bi-ticket-perforated-fill"></i>
+    <span>Vouchers Info</span>
+
 </a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
+</a>
+
+
+
+
+
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "driver")
-<a href="/dashboard" class="active">
-    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-</a>
-<a href="{{ route('generated') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Generated vouchar</span>
-</a>
-<a href="{{ route('expired') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Expired vouchar</span>
-</a>
-<a href="" class="">
-    <i class="bi bi-gear"></i> <span>Setting</span>
-</a>
-@elseif(Auth::guard('manager')->check() && Auth::guard('manager')->user()->role == "station_manager")
-<a href="/dashboard" class="active">
-    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-</a>
-<a href="{{ route('fuelManagers.index') }}" class="">
-    <i class="bi bi-person-lines-fill"></i> <span>Staff info</span>
-</a>
-<a href="{{ route('verify') }}" class="">
-    <i class="bi bi-person-lines-fill"></i> <span>Scaned Vouchar</span>
-</a>
-<a href="{{ route('fuelManagers.index') }}" class="">
-    <i class="bi bi-person-lines-fill"></i> <span>Report</span>
-</a>
-<a href="#" class="">
-    <i class="bi bi-person-lines-fill"></i> <span>Setting</span>
-</a>
-@elseif(Auth::guard('manager')->check() && Auth::guard('manager')->user()->role == "attendant")
-<a href="/dashboard" class="active">
-    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-</a>
-<a href="{{ route('verify') }}" class="">
-    <i class="bi bi-door-open-fill"></i> <span>Scanning vouchar</span>
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
 </a>
 
-<a href="#" class="">
-    <i class="bi bi-gear"></i> <span>Setting</span>
+<a href="{{ route('generated') }}"
+   class="{{ request()->routeIs('generated') ? 'active' : '' }}">
+
+    <i class="bi bi-ticket-detailed-fill"></i>
+    <span>Generated Voucher</span>
+
 </a>
 
+<a href="{{ route('expired') }}"
+   class="{{ request()->routeIs('expired') ? 'active' : '' }}">
+
+    <i class="bi bi-x-circle-fill"></i>
+    <span>Expired Voucher</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
+</a>
+
+
+
+
+
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "station_manager")
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
+</a>
+
+<a href="{{ route('fuelManagers.index') }}"
+   class="{{ request()->routeIs('fuelManagers.*') ? 'active' : '' }}">
+
+    <i class="bi bi-people-fill"></i>
+    <span>Staff Info</span>
+
+</a>
+
+<a href="{{ route('verify') }}"
+   class="{{ request()->routeIs('verify') ? 'active' : '' }}">
+
+    <i class="bi bi-qr-code-scan"></i>
+    <span>Scanned Voucher</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-clipboard-data-fill"></i>
+    <span>Reports</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
+</a>
+
+
+
+
+
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "attendant")
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
+</a>
+
+<a href="{{ route('verify') }}"
+   class="{{ request()->routeIs('verify') ? 'active' : '' }}">
+
+    <i class="bi bi-upc-scan"></i>
+    <span>Scanning Voucher</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
+</a>
 
 @endif
 

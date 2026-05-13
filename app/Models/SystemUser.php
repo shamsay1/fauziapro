@@ -19,7 +19,8 @@ class SystemUser extends Authenticatable
         'email',
         'password',
         'role',
-        'organization_id'
+        'organization_id',
+        'station_id'
     ];
 
     protected $hidden = [
@@ -36,5 +37,9 @@ public function organization()
 {
     return $this->belongsTo(Gapco::class, 'organization_id');
 }
+
+    public function station(){
+        return $this->belongsTo(Station::class);
+    }
    
 }

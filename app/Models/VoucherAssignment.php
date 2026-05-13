@@ -29,6 +29,6 @@ class VoucherAssignment extends Model
 }
     public function voucher_verify()
     {
-        return $this->belongsTo(FuelManager::class,'verified_by');
+        return $this->belongsTo(SystemUser::class,'verified_by');
     }
 }

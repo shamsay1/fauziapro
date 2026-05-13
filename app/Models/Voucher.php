@@ -16,7 +16,7 @@ class Voucher extends Model
 
 public function request()
 {
-    return $this->belongsTo(UserRequest::class);
+    return $this->belongsTo(UserRequest::class,'request_id');
 }
 
 }

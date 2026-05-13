@@ -21,7 +21,7 @@ class PaymentController extends Controller
         return view('paymentverify', compact('payments', 'requests', 'users'));
     }
 
-    // VERIFY PAYMENT
+   
     public function verify(Request $request, $id)
 {
     $payment = Payment::findOrFail($id);
@@ -33,24 +33,21 @@ class PaymentController extends Controller
 
     $expectedAmount = $payment->request->request_amount;
 
-    // ❌ CHECK AMOUNT
     if ($request->amount_paid != $expectedAmount) {
         return back()->with('error', 'Amount does not match request amount!');
     }
-
-    // ✅ UPDATE PAYMENT
     $payment->update([
         'referrence_number' => $request->referrence_number,
         'amount_paid'       => $request->amount_paid,
         'status'            => 'confirmed',
-        'verified_by'       => 2, // badilisha baadae na auth
+        'verified_by'       => 2, 
     ]);
 
     
     Voucher::create([
         'request_id'   => $payment->request_id,
         'voucher_code' => strtoupper(Str::random(10)),
-        'qr_code'      => 'QR-' . Str::random(10), // unaweza improve baadaye
+        'qr_code'      => 'QR-' . Str::random(10), 
         'amount'       => $request->amount_paid,
         'status'       => 'unused',
         'expiry_date'  => now()->addDays(30),

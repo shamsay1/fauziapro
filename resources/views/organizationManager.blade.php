@@ -71,7 +71,7 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-2">
-                            <input type="password" name="password" class="form-control" placeholder="Password" required>
+                            <input type="password" name="password" class="form-control" placeholder="Password" value="12345" required>
                         </div>
 
                         <div class="col-md-6 mb-2">
@@ -83,9 +83,9 @@
 
                                 @else
                                 <option value="">Select Role</option>
-                                <option value="admin">Admin</option>
                                 <option value="manager">Manager</option>
-                                <option value="staff">Staff</option>
+                                <option value="station_manager">Fuel station Manager</option>
+                                <option value="attendant">Fuel attendant</option>
                                 @endif
                             </select>
                         </div>
@@ -93,8 +93,8 @@
                 @if(Auth::guard('web')->user()->role=="manager")
                 <input type="hidden" name="organization_id" value="{{ Auth::guard('web')->user()->organization_id }}">
                 @else
-             
-                    <div class="mb-2">
+                  <div class="row">
+                    <div class="col-md-6 mb-2">
                         <select name="organization_id" class="form-control">
                             <option value="">Select Organization</option>
                             @foreach($organizations as $org)
@@ -103,6 +103,17 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <select name="station_id" class="form-control">
+                            <option value="">Select station</option>
+                            @foreach($stations as $st)
+                                <option value="{{ $st->id }}">
+                                    {{ $st->station_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                     </div>
                     @endif
 
@@ -130,99 +141,211 @@
 </div>
 
 <!-- TABLE -->
+<!-- FILTER FORM -->
+
+<form method="GET" action="{{ route('users.index') }}">
+
+    <div class="row mb-3">
+
+        <!-- ROLE -->
+        <div class="col-md-3">
+
+            <label class="form-label">
+                Filter By Role
+            </label>
+
+            <select name="role" class="form-select">
+
+                <option value="">
+                    -- Select Role --
+                </option>
+
+                <option value="station_manager"
+                    {{ request('role') == 'station_manager' ? 'selected' : '' }}>
+                    Station Manager
+                </option>
+                <option value="attendant"
+                    {{ request('role') == 'attendant' ? 'selected' : '' }}>
+                    Fuel Attendant
+                </option>
+
+                <option value="manager"
+                    {{ request('role') == 'manager' ? 'selected' : '' }}>
+                    Manager
+                </option>
+
+                <option value="accountant"
+                    {{ request('role') == 'accountant' ? 'selected' : '' }}>
+                    Accountant
+                </option>
+
+                <option value="driver"
+                    {{ request('role') == 'driver' ? 'selected' : '' }}>
+                    Driver
+                </option>
+
+            </select>
+
+        </div>
+
+        <!-- ORGANIZATION -->
+        <div class="col-md-4">
+
+            <label class="form-label">
+                Filter By Organization
+            </label>
+
+            <select name="organization_id" class="form-select">
+
+                <option value="">
+                    -- Select Organization --
+                </option>
+
+                @foreach($organizations as $org)
+
+                    <option value="{{ $org->id }}"
+                        {{ request('organization_id') == $org->id ? 'selected' : '' }}>
+
+                        {{ $org->company_name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </div>
+
+        <!-- STATION -->
+        <div class="col-md-3">
+
+            <label class="form-label">
+                Filter By Station
+            </label>
+
+            <select name="station_id" class="form-select">
+
+                <option value="">
+                    -- Select Station --
+                </option>
+
+                @foreach($stations as $station)
+
+                    <option value="{{ $station->id }}"
+                        {{ request('station_id') == $station->id ? 'selected' : '' }}>
+
+                        {{ $station->station_name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </div>
+
+        <!-- BUTTON -->
+        <div class="col-md-2 d-flex align-items-end">
+
+            <button class="btn btn-primary w-100">
+
+                <i class="bi bi-search"></i>
+
+                Filter
+
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
 <table class="table table-bordered table-sm">
-    <thead>
+
+    <thead class="table-dark">
+
         <tr>
+
             <th>#</th>
             <th>Name</th>
             <th>Mobile</th>
             <th>Email</th>
             <th>Role</th>
             <th>Organization</th>
+            <th>Station</th>
             <th>Action</th>
+
         </tr>
+
     </thead>
 
     <tbody>
+
         @forelse($users as $index => $user)
+
         <tr>
+
             <td>{{ $index + 1 }}</td>
-            <td>{{ $user->first_name }} {{ $user->last_name }}</td>
-            <td>{{ $user->mobile }}</td>
-            <td>{{ $user->email }}</td>
-            <td>{{ $user->role }}</td>
-            <td>{{ $user->organization->company_name ?? 'N/A' }}</td>
 
             <td>
-                <!-- EDIT BUTTON -->
+                {{ $user->first_name }}
+                {{ $user->last_name }}
+            </td>
+
+            <td style="text-align: center">{{ $user->mobile }}</td>
+
+            <td style="text-align: center">{{ $user->email }}</td>
+
+            <td style="text-align: center">
+                <span class="badge bg-primary">
+                    {{ ucfirst($user->role) }}
+                </span>
+            </td>
+
+            <td style="text-align: center">
+                {{ $user->organization->company_name ?? 'N/A' }}
+            </td>
+
+            <td style="text-align: center">
+                {{ $user->station->station_name ?? '-' }}
+            </td>
+
+            <td>
+
                 <button class="btn btn-primary btn-sm"
                     data-bs-toggle="modal"
                     data-bs-target="#edit{{ $user->id }}">
+
                     <i class="bi bi-pencil-square"></i>
-                    
+
                 </button>
+                <button class="btn btn-danger btn-sm">
+
+        <i class="bi bi-slash-circle" title="Block user"></i>
+
+    </button>
+
             </td>
+
         </tr>
-
-        <!-- EDIT MODAL -->
-        <div class="modal fade" id="edit{{ $user->id }}">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-
-                    <div class="modal-header bg-primary text-white">
-                        <h5>Edit User</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <form action="{{ route('users.update', $user->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="modal-body">
-
-                            <input type="text" name="first_name" value="{{ $user->first_name }}" class="form-control mb-2">
-
-                            <input type="text" name="last_name" value="{{ $user->last_name }}" class="form-control mb-2">
-
-                            <input type="text" name="mobile" value="{{ $user->mobile }}" class="form-control mb-2">
-
-                            <input type="email" name="email" value="{{ $user->email }}" class="form-control mb-2">
-
-                            <input type="password" name="password" class="form-control mb-2" placeholder="New Password (optional)">
-
-                            <select name="role" class="form-control mb-2">
-                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="manager" {{ $user->role == 'manager' ? 'selected' : '' }}>Manager</option>
-                                <option value="staff" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
-                            </select>
-
-                            <select name="organization_id" class="form-control">
-                                @foreach($organizations as $org)
-                                    <option value="{{ $org->id }}"
-                                        {{ $user->organization_id == $org->id ? 'selected' : '' }}>
-                                        {{ $org->company_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button class="btn btn-success">Update</button>
-                        </div>
-
-                    </form>
-
-                </div>
-            </div>
-        </div>
 
         @empty
+
         <tr>
-            <td colspan="7" class="text-center">No Users Found</td>
+
+            <td colspan="8" class="text-center text-danger">
+
+                Please filter data first
+
+            </td>
+
         </tr>
+
         @endforelse
+
     </tbody>
+
 </table>
 
 </div>

@@ -11,7 +11,13 @@ class UserRequestController extends Controller
 {
     public function index()
     {
-        $requests = UserRequest::with('user')->latest()->get();
+        if(Auth::guard('web')->user()->role=="manager"){
+        $requests = UserRequest::with('user.organization')->where('requested_by',Auth::guard('web')->user()->id)->latest()->get();
+        }else{
+        $requests = UserRequest::with('user.organization')->latest()->get();
+
+
+        }
         $users = SystemUser::all();
 
         return view('userRequest', compact('requests', 'users'));
@@ -49,4 +55,18 @@ class UserRequestController extends Controller
 
         return back()->with('success', 'Request updated successfully');
     }
+    public function toggleStatus($id)
+{
+    $req = UserRequest::findOrFail($id);
+
+    if ($req->status == 'approved') {
+        $req->status = 'pending';
+    } else {
+        $req->status = 'approved';
+    }
+
+    $req->save();
+
+    return back()->with('success', 'Status updated successfully');
+}
 }

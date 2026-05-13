@@ -88,140 +88,401 @@
 </div>
 
 <!-- TABLE -->
-<table class="table table-bordered table-sm">
-    <thead>
+<table class="table table-bordered table-sm align-middle">
+    <thead class="table-dark">
         <tr>
             <th>#</th>
-            <th>User</th>
+            <th>Organization</th>
             <th>Amount</th>
             <th>Litre(s)</th>
-            <th>Date of requested</th>
+            <th>Requested Date</th>
             <th>Status</th>
-            @if(Auth::guard('web')->user()->role=="admin")
-            <th>Action</th>
+            <th>Payment</th>
+
+            @if(Auth::guard('web')->user()->role == "admin")
+                <th width="120">Action</th>
             @endif
         </tr>
     </thead>
 
     <tbody>
+
         @forelse($requests as $index => $req)
+
         <tr>
+
             <td>{{ $index + 1 }}</td>
-            <td>{{ $req->user->first_name ?? '' }} {{ $req->user->last_name ?? '' }}</td>
-            <td>{{ number_format($req->request_amount) }}</td>
-            <td>{{ $req->number_of_litre }} litres</td>
-            <td>{{ $req->created_at }}</td>
+
             <td>
-                @if($req->status == 'pending')
-                    <span class="badge bg-warning">Pending</span>
-                @elseif($req->status == 'approved')
-                    <span class="badge bg-success">Approved</span>
-                @else
-                    <span class="badge bg-danger">Rejected</span>
-                @endif
+                {{ $req->user->organization->company_name ?? 'N/A' }}
             </td>
-            @if(Auth::guard('web')->user()->role=="admin")
+
+            <td class="text-end">
+                {{ number_format($req->request_amount) }}
+            </td>
+
+            <td class="text-end">
+                {{ number_format($req->number_of_litre) }} Litres
+            </td>
+
             <td>
+                {{ date('d M Y H:i', strtotime($req->created_at)) }}
+            </td>
+
+            <td class="text-center">
+
+                @if($req->status == 'pending')
+
+                    <span class="badge bg-warning text-dark">
+                        Pending
+                    </span>
+
+                @elseif($req->status == 'approved')
+
+                    <span class="badge bg-success">
+                        Approved
+                    </span>
+
+                @else
+
+                    <span class="badge bg-danger">
+                        Rejected
+                    </span>
+
+                @endif
+
+            </td>
+
+            <!-- PAYMENT BUTTON -->
+            <td class="text-center">
+
+                @if(
+                    Auth::guard('web')->user()->role == "manager"
+                    && $req->status == 'approved'
+                )
+
+                    <button class="btn btn-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#payment{{ $req->id }}">
+
+                        Pay Now
+
+                    </button>
+
+                @else
+
+                    -
+
+                @endif
+
+            </td>
+
+            <!-- ADMIN ACTION -->
+            @if(Auth::guard('web')->user()->role == "admin")
+
+            <td class="text-center">
+
                 <!-- EDIT -->
                 <button class="btn btn-primary btn-sm"
                     data-bs-toggle="modal"
                     data-bs-target="#edit{{ $req->id }}">
+
                     <i class="bi bi-pencil-square"></i>
-                    
+
                 </button>
+
+                <!-- APPROVE / DISAPPROVE -->
+                <button class="btn btn-sm
+                    {{ $req->status == 'approved' ? 'btn-warning' : 'btn-success' }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#toggleStatus{{ $req->id }}">
+
+                    @if($req->status == 'approved')
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    @else
+                        <i class="bi bi-check-circle"></i>
+                    @endif
+
+                </button>
+
             </td>
+
             @endif
+
         </tr>
-  @if(Auth::guard('web')->user()->role=="manager" && $req->status == 'approved')
-<button class="btn btn-success btn-sm mt-3 mb-3"
-    data-bs-toggle="modal"
-    data-bs-target="#payment{{ $req->id }}">
-    Pay now
-</button>
-@endif
+
+        <!-- PAYMENT MODAL -->
         <div class="modal fade" id="payment{{ $req->id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            
-            <form action="{{ route('payments.store') }}" method="POST">
-                @csrf
 
-                <div class="modal-header">
-                    <h5 class="modal-title">Make Payment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+            <div class="modal-dialog">
 
-                <div class="modal-body">
-
-                    <!-- Correct variable -->
-                    <input type="hidden" name="request_id" value="{{ $req->id }}">
-
-                    <div class="mb-3">
-                        <label>Reference Number</label>
-                        <input type="text" name="referrence_number" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Amount Paid</label>
-                        <input type="text" name="amount_paid" class="form-control">
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Submit Payment</button>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-</div>
-
-        <!-- EDIT MODAL -->
-        <div class="modal fade" id="edit{{ $req->id }}">
-            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
-                    <div class="modal-header bg-primary text-white">
-                        <h5>Edit Request</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+                    <form action="{{ route('payments.store') }}" method="POST">
 
-                    <form action="{{ route('userRequest.update', $req->id) }}" method="POST">
                         @csrf
-                        @method('PUT')
+
+                        <div class="modal-header bg-success text-white">
+
+                            <h5 class="modal-title">
+                                Make Payment
+                            </h5>
+
+                            <button type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal">
+                            </button>
+
+                        </div>
 
                         <div class="modal-body">
 
-                            <input type="text" name="request_amount"
-                                value="{{ $req->request_amount }}"
-                                class="form-control mb-2">
+                            <input type="hidden"
+                                name="request_id"
+                                value="{{ $req->id }}">
 
-                            <select name="status" class="form-control">
-                                <option value="pending" {{ $req->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="approved" {{ $req->status == 'approved' ? 'selected' : '' }}>Approved</option>
-                                <option value="rejected" {{ $req->status == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                            </select>
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Reference Number
+                                </label>
+
+                                <input type="text"
+                                    name="referrence_number"
+                                    class="form-control"
+                                    required>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Amount Paid
+                                </label>
+
+                                <input type="number"
+                                    name="amount_paid"
+                                    class="form-control"
+                                    required>
+
+                            </div>
 
                         </div>
 
                         <div class="modal-footer">
-                            <button class="btn btn-success">Approve</button>
+
+                            <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+
+                                Close
+
+                            </button>
+
+                            <button type="submit"
+                                class="btn btn-success">
+
+                                Submit Payment
+
+                            </button>
+
                         </div>
 
                     </form>
 
                 </div>
+
             </div>
+
+        </div>
+
+        <!-- TOGGLE STATUS MODAL -->
+        <div class="modal fade"
+            id="toggleStatus{{ $req->id }}"
+            tabindex="-1">
+
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">
+                            Confirm Action
+                        </h5>
+
+                        <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        @if($req->status == 'approved')
+
+                            Are you sure you want to disapprove this request?
+
+                        @else
+
+                            Are you sure you want to approve this request?
+
+                        @endif
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                            Cancel
+
+                        </button>
+
+                        <form method="POST"
+                            action="{{ route('request.toggleStatus', $req->id) }}">
+
+                            @csrf
+                            @method('PUT')
+
+                            <button type="submit"
+                                class="btn
+                                {{ $req->status == 'approved'
+                                    ? 'btn-warning'
+                                    : 'btn-success' }}">
+
+                                Yes Confirm
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- EDIT MODAL -->
+        <div class="modal fade"
+            id="edit{{ $req->id }}"
+            tabindex="-1">
+
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+
+                        <h5 class="modal-title">
+                            Edit Request
+                        </h5>
+
+                        <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+                    <form action="{{ route('userRequest.update', $req->id) }}"
+                        method="POST">
+
+                        @csrf
+                        @method('PUT')
+
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Request Amount
+                                </label>
+
+                                <input type="number"
+                                    name="request_amount"
+                                    value="{{ $req->request_amount }}"
+                                    class="form-control">
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Status
+                                </label>
+
+                                <select name="status"
+                                    class="form-select">
+
+                                    <option value="pending"
+                                        {{ $req->status == 'pending' ? 'selected' : '' }}>
+                                        Pending
+                                    </option>
+
+                                    <option value="approved"
+                                        {{ $req->status == 'approved' ? 'selected' : '' }}>
+                                        Approved
+                                    </option>
+
+                                    <option value="rejected"
+                                        {{ $req->status == 'rejected' ? 'selected' : '' }}>
+                                        Rejected
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+
+                                Close
+
+                            </button>
+
+                            <button type="submit"
+                                class="btn btn-primary">
+
+                                Update Request
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
         </div>
 
         @empty
+
         <tr>
-            <td colspan="5" class="text-center">No Requests Found</td>
+
+            <td colspan="8" class="text-center text-danger">
+
+                No Requests Found
+
+            </td>
+
         </tr>
+
         @endforelse
+
     </tbody>
+
 </table>
 
 

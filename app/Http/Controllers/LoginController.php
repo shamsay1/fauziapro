@@ -28,15 +28,15 @@ class LoginController extends Controller
     }
 
     
-    if (Auth::guard('manager')->attempt($credentials)) {
+    // if (Auth::guard('manager')->attempt($credentials)) {
 
-        $user = Auth::guard('manager')->user();
-        if($user->role=="attendant"){
-            return redirect()->route("verify");
-        }else{
-            return redirect()->route("dashboard");
-        }
-    }
+    //     $user = Auth::guard('manager')->user();
+    //     if($user->role=="attendant"){
+    //         return redirect()->route("verify");
+    //     }else{
+    //         return redirect()->route("dashboard");
+    //     }
+    // }
     return back()->with('error', 'Invalid email or password');
 }
     public function logout(Request $request)
