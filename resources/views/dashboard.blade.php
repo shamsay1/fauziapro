@@ -67,10 +67,12 @@
             <div class="card-title">Pending request</div>
             <div class="card-value">{{ $tpending }}</div>
         </div>
-        <div class="card-custom">
-            <div class="card-title">Vorchar Remaing Amount</div>
-            <div class="card-value">{{ number_format($voucher_remain->amount) }} TZS</div>
-        </div>
+       <div class="card-custom">
+    <div class="card-title">Fuel Balance</div>
+    <div class="card-value">
+        {{ number_format(($voucher_remain?->amount ?? 0) / 3000, 2) }} litres
+    </div>
+</div>
         @elseif(Auth::guard('web')->user()->role == "station_manager")
         <div class="card-custom">
             <div class="card-title">Fuel Attendant registered</div>
@@ -86,8 +88,9 @@
             <div class="card-value">{{ $count2 }} </div>
         </div>
          <div class="card-custom">
-            <div class="card-title">Vorchar Remaing Amount</div>
-            <div class="card-value">{{ number_format($voucher_remain->amount) }} TZS</div>
+            <div class="card-title">Fuel balanced</div>
+            <div class="card-value">{{ round($voucher_remain->amount/3000,2) }} L</div>
+           
         </div>
         @elseif(Auth::guard('web')->user()->role == "driver")
         <div class="card-custom">

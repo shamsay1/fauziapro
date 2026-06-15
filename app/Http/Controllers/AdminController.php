@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FuelManager;
+use App\Models\Notification;
 use App\Models\Payment;
 use App\Models\Station;
 use Illuminate\Support\Facades\Password;
@@ -85,7 +86,9 @@ class AdminController extends Controller
     })
     
     ->count();
-        return view("dashboard",compact('count3','count2','count1','attendant','voucher_remain','total_account','total_driver','tpending','total_manager','total_station','total_customer','totalRevenue','total_request','pending','approved','stationNames','employeeCounts','monthNames', 'totals'));
+    $noteCount = Notification::where("read_by","admin")->count();
+    $notes = Notification::where("read_by","admin")->get();
+        return view("dashboard",compact('noteCount','notes','count3','count2','count1','attendant','voucher_remain','total_account','total_driver','tpending','total_manager','total_station','total_customer','totalRevenue','total_request','pending','approved','stationNames','employeeCounts','monthNames', 'totals'));
     }
      public function forgot(){
         return view("forgotpassword");
@@ -96,7 +99,7 @@ class AdminController extends Controller
         'email' => 'required|email'
     ]);
 
-    $status = Password::broker('system_users')->sendResetLink(
+    $status = Password::broker('users')->sendResetLink(
         $request->only('email')
     );
 
@@ -119,7 +122,7 @@ class AdminController extends Controller
         'password' => 'required|min:4|confirmed'
     ]);
 
-    $status = Password::broker('system_users')->reset(
+    $status = Password::broker('users')->reset(
         $request->only('email', 'password', 'password_confirmation', 'token'),
         function ($teacher, $password) {
             $teacher->password = Hash::make($password);
@@ -130,6 +133,24 @@ class AdminController extends Controller
     return $status === Password::PASSWORD_RESET
         ? redirect()->route('login1')->with('success', 'Password changed success!')
         : back()->withErrors(['email' => __($status)]);
+}
+
+
+    public function delete_all()
+{
+    Notification::where('read_by', 'admin')->delete();
+
+    return back()->with('success', 'Notifications deleted successfully');
+}
+
+
+    public function show($id)
+{
+    $voucher = Voucher::with([
+        'request.user.organization'
+    ])->findOrFail($id);
+
+    return view('vouchershow', compact('voucher'));
 }
     
 }

@@ -37,3 +37,9 @@ Route::get("/forgot",[AdminController::class,"forgot"])->name("forgot");
 Route::post('/forgot-password', [AdminController::class, 'sendResetLink'])->name('password.email');
 Route::get('/reset-password/{token}', [AdminController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [AdminController::class, 'updatePassword'])->name('password.update');
+Route::get('/users/{id}/toggle-status',
+    [SystemUserController::class,'toggleStatus'])
+    ->name('users.toggle-status');
+Route::delete("/delete_notes",[AdminController::class,"delete_all"])->name("delete_all");
+Route::get('/vouchers/{id}', [AdminController::class, 'show'])
+    ->name('vouchers.show1');

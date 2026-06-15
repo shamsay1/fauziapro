@@ -31,7 +31,7 @@
 <div class="table-container">
 
 <!-- Button -->
-@if(Auth::guard('web')->user()->role == "manager")
+@if(Auth::guard('web')->user()->role == "accountant")
 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addRequest">
     + Add Request
 </button>
@@ -93,15 +93,13 @@
         <tr>
             <th>#</th>
             <th>Organization</th>
-            <th>Amount</th>
+            <th>Requested Amount</th>
             <th>Litre(s)</th>
             <th>Requested Date</th>
-            <th>Status</th>
-            <th>Payment</th>
-
-            @if(Auth::guard('web')->user()->role == "admin")
-                <th width="120">Action</th>
-            @endif
+            <th>Request Status</th>
+            <th>Payment Status</th>
+                <th>Action</th>
+            
         </tr>
     </thead>
 
@@ -129,90 +127,94 @@
                 {{ date('d M Y H:i', strtotime($req->created_at)) }}
             </td>
 
-            <td class="text-center">
-
+            <td>
                 @if($req->status == 'pending')
-
-                    <span class="badge bg-warning text-dark">
-                        Pending
-                    </span>
-
+                    <span class="badge bg-warning">Pending</span>
                 @elseif($req->status == 'approved')
+                    <span class="badge bg-success">Approved</span>
+                @else
+                    <span class="badge bg-danger">Rejected</span>
+                @endif
+            </td>
 
-                    <span class="badge bg-success">
-                        Approved
-                    </span>
+            <td>
+                @if(
+                    Auth::guard('web')->user()->role == "accountant"
+                    && $req->status == 'approved'
+                )
+
+                    
+
+                @endif
+                
+                @if($req->payment)
+
+                    @if($req->payment->status == 'pending')
+                        <span class="badge bg-danger">
+                            Not paid
+                        </span>
+                    @else
+                        <span class="badge bg-success">
+                            Paid
+                        </span>
+                    @endif
 
                 @else
 
                     <span class="badge bg-danger">
-                        Rejected
+                        Not Paid
                     </span>
 
                 @endif
-
             </td>
+            @if(Auth::guard('web')->user()->role == "accountant")
 
-            <!-- PAYMENT BUTTON -->
-            <td class="text-center">
+            <td>
 
-                @if(
-                    Auth::guard('web')->user()->role == "manager"
-                    && $req->status == 'approved'
-                )
-
-                    <button class="btn btn-success btn-sm"
+                <button class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#payment{{ $req->id }}">
 
                         Pay Now
 
                     </button>
+            </td>
+            @endif
+            @if(Auth::guard('web')->user()->role == "admin")
+<td>
 
-                @else
+    {{-- APPROVE / DISAPPROVE REQUEST --}}
+    <button class="btn btn-sm
+        {{ $req->status == 'approved' ? 'btn-warning' : 'btn-success' }}"
+        data-bs-toggle="modal"
+        data-bs-target="#toggleStatus{{ $req->id }}">
 
-                    -
+        @if($req->status == 'approved')
+            <i class="bi bi-arrow-counterclockwise"></i>
+        @else
+            <i class="bi bi-check-circle"></i>
+        @endif
+
+    </button>
+@endif
+
+            @if(Auth::guard('web')->user()->role == "admin")
+
+                @if($req->payment && $req->payment->status == 'pending')
+
+                    <button class="btn btn-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#verify{{ $req->payment->id }}">
+                        Verify
+                    </button>
 
                 @endif
 
             </td>
-
-            <!-- ADMIN ACTION -->
-            @if(Auth::guard('web')->user()->role == "admin")
-
-            <td class="text-center">
-
-                <!-- EDIT -->
-                <button class="btn btn-primary btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#edit{{ $req->id }}">
-
-                    <i class="bi bi-pencil-square"></i>
-
-                </button>
-
-                <!-- APPROVE / DISAPPROVE -->
-                <button class="btn btn-sm
-                    {{ $req->status == 'approved' ? 'btn-warning' : 'btn-success' }}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#toggleStatus{{ $req->id }}">
-
-                    @if($req->status == 'approved')
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                    @else
-                        <i class="bi bi-check-circle"></i>
-                    @endif
-
-                </button>
-
-            </td>
-
             @endif
 
         </tr>
-
-        <!-- PAYMENT MODAL -->
-        <div class="modal fade" id="payment{{ $req->id }}" tabindex="-1">
+         <div class="modal fade" id="payment{{ $req->id }}" tabindex="-1">
 
             <div class="modal-dialog">
 
@@ -244,12 +246,13 @@
                             <div class="mb-3">
 
                                 <label class="form-label">
-                                    Reference Number
+                                    Amount to be Paid
                                 </label>
 
                                 <input type="text"
                                     name="referrence_number"
                                     class="form-control"
+                                    value="{{ $req->request_amount }}"
                                     required>
 
                             </div>
@@ -257,7 +260,7 @@
                             <div class="mb-3">
 
                                 <label class="form-label">
-                                    Amount Paid
+                                    Mobile Number
                                 </label>
 
                                 <input type="number"
@@ -466,23 +469,17 @@
             </div>
 
         </div>
-
         @empty
+<tr>
+    <td colspan="10" class="text-center">
+        No Requests Found
+    </td>
+</tr>
+@endforelse
 
-        <tr>
-
-            <td colspan="8" class="text-center text-danger">
-
-                No Requests Found
-
-            </td>
-
-        </tr>
-
-        @endforelse
+        
 
     </tbody>
-
 </table>
 
 
@@ -504,5 +501,4 @@
         }
     });
 </script>
-
 @endsection

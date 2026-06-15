@@ -65,10 +65,10 @@
                 {{ $pay->request->user->organization->company_name ?? '' }}
             </td>
 
-            <td>{{ $pay->request->request_amount }}</td>
-            <td>{{ $pay->amount_paid ?? '-' }}</td>
+            <td style="text-align: end">{{ number_format($pay->request->request_amount) }}</td>
+            <td style="text-align: end">{{ number_format($pay->amount_paid) ?? '-' }}</td>
 
-            <td>
+            <td style="text-align: center">
                 @if($pay->status == 'pending')
                     <span class="badge bg-warning">Not paid</span>
                 @else

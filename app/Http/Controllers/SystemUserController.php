@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gapco;
+use App\Models\Notification;
 use App\Models\Station;
 use App\Models\SystemUser;
 use App\Models\Voucher;
@@ -88,11 +89,14 @@ class SystemUserController extends Controller
     $organizations = Gapco::orderBy('company_name')->get();
 
     $stations = Station::orderBy('station_name')->get();
-
+    $noteCount = Notification::where("read_by","admin")->count();
+    $notes = Notification::where("read_by","admin")->get();
     return view(
         'organizationManager',
         compact(
             'users',
+            'noteCount',
+            'notes',
             'organizations',
             'stations'
         )
@@ -127,39 +131,23 @@ class SystemUserController extends Controller
     }
 
     
-    public function update(Request $request, $id)
-    {
-        $user = SystemUser::findOrFail($id);
+    public function update(Request $request,$id)
+{
+    $user = SystemUser::findOrFail($id);
 
-        $request->validate([
-            'first_name'      => 'required',
-            'last_name'       => 'required',
-            'mobile'          => 'required',
-            'email'           => 'required|email|unique:system_users,email,' . $id,
-            'role'            => 'required',
-        ]);
+    $user->update([
+        'first_name' => $request->first_name,
+        'last_name'  => $request->last_name,
+        'email'      => $request->email,
+        'mobile'      => $request->mobile,
+        'role'       => $request->role,
+    ]);
 
-        $data = [
-            'first_name'      => $request->first_name,
-            'last_name'       => $request->last_name,
-            'mobile'          => $request->mobile,
-            'email'           => $request->email,
-            'role'            => $request->role,
-            'organization_id' => $request->organization_id,
-        ];
-
-        
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
-
-        $user->update($data);
-
-        return back()->with('success', 'User updated successfully');
-    } 
+    return back()->with('success','User updated successfully');
+}
     public function show()
 {
-    $users = SystemUser::where('role','driver')->where('organization_id',Auth::guard('web')->user()->organization_id)->get();
+    $users = SystemUser::where('role','!=','accountant')->where('organization_id',Auth::guard('web')->user()->organization_id)->get();
     $vouchers = Voucher::with(['request.user.organization'])
     ->whereHas('request.user', function($query){
         $query->where('organization_id', Auth::guard('web')->user()->organization_id);
@@ -173,8 +161,11 @@ class SystemUserController extends Controller
 {
     $request->validate([
         'driver_id' => 'required',
-        'amount' => 'required|numeric|min:1'
+        'litres'    => 'required|min:1'
     ]);
+
+    $litres = $request->litres;
+    $amount = $litres * 3000; // 1 litre = 3000 TZS
 
     $voucher = Voucher::whereHas('request.user', function ($query) {
         $query->where(
@@ -186,36 +177,41 @@ class SystemUserController extends Controller
     ->latest()
     ->first();
 
-    if (!$voucher || $voucher->amount < $request->amount) {
-        return back()->with('error', 'Voucher haitoshi');
+    if (!$voucher || $voucher->amount < $amount) {
+        return back()->with('error', 'Your Vouchar has been finished please make another requtes');
     }
 
     try {
-        DB::transaction(function () use ($voucher, $request) {
+
+        DB::transaction(function () use ($voucher, $request, $amount, $litres) {
 
             $reference = 'VCH-' . strtoupper(Str::random(8));
 
             VoucherAssignment::create([
-                'voucher_id' => $voucher->id,
-                'driver_id' => $request->driver_id,
-                'reference_number' => $reference,
-                'qr_code' => 'QR-' . Str::random(10),
-                'amount' => $request->amount
+                'voucher_id'        => $voucher->id,
+                'driver_id'         => $request->driver_id,
+                'reference_number'  => $reference,
+                'qr_code'           => 'QR-' . Str::random(10),
+                'amount'            => $amount,
+                'litres'            => $litres
             ]);
 
-            $voucher->decrement('amount', $request->amount);
+            $voucher->decrement('amount', $amount);
 
-            if ($voucher->amount <= 0) {
-                $voucher->update(['status' => 'finished']);
+            if ($voucher->amount - $amount <= 0) {
+                $voucher->update([
+                    'status' => 'finished'
+                ]);
             }
         });
 
         return back()->with('success', 'Voucher generated successfully');
 
     } catch (\Exception $e) {
-        dd($e->getMessage());
-    }
 
+        return back()->with('error', $e->getMessage());
+
+    }
 }
     public function generated(){
         $user = Auth::guard('web')->user()->id;
@@ -275,4 +271,21 @@ class SystemUserController extends Controller
 
         return view('testing', compact('users', 'organizations','stations'));
     }
+
+    public function toggleStatus($id)
+{
+    $user = SystemUser::findOrFail($id);
+
+    $user->status =
+        $user->status == 'Active'
+        ? 'blocked'
+        : 'Active';
+
+    $user->save();
+
+    return back()->with(
+        'success',
+        'User status updated successfully'
+    );
+}
 }

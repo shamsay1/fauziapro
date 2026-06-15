@@ -23,20 +23,15 @@ class LoginController extends Controller
     if (Auth::guard('web')->attempt($credentials)) {
 
         $user = Auth::guard('web')->user();
-
+        if($user->status == "Active"){
         return redirect()->route('dashboard'); 
+        }
+        if($user->status == "blocked"){
+            return back()->with("error","Your account is blocked!");
+        }
+        
+
     }
-
-    
-    // if (Auth::guard('manager')->attempt($credentials)) {
-
-    //     $user = Auth::guard('manager')->user();
-    //     if($user->role=="attendant"){
-    //         return redirect()->route("verify");
-    //     }else{
-    //         return redirect()->route("dashboard");
-    //     }
-    // }
     return back()->with('error', 'Invalid email or password');
 }
     public function logout(Request $request)

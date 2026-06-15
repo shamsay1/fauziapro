@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hotel Login</title>
+    <title>New password</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap -->
@@ -81,8 +81,8 @@
 
 <div class="login-card">
     
-    <h4 class="login-title text-center">
-        Hotel Reservation <br> Management System
+    <h4 style="font-size:19px">
+        Fuel Vouchar Management System
     </h4>
 
     <p class="text-center text-muted mb-3" style="font-size: 14px;">

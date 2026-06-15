@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gapco;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class GapcoController extends Controller
@@ -10,8 +11,9 @@ class GapcoController extends Controller
     public function index()
     {
         $gapcos = Gapco::where('id','>',1)->latest()->get();
-
-        return view('organization', compact('gapcos'));
+        $noteCount = Notification::where("read_by","admin")->count();
+        $notes = Notification::where("read_by","admin")->get();
+        return view('organization', compact('gapcos','noteCount','notes'));
     }
 
     

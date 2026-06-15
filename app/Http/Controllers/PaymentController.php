@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Payment;
 use App\Models\SystemUser;
 use App\Models\UserRequest;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class PaymentController extends Controller
@@ -17,8 +19,10 @@ class PaymentController extends Controller
         $payments = Payment::with(['request.user', 'verifier'])->latest()->get();
         $requests = UserRequest::all();
         $users = SystemUser::all();
+        $noteCount = Notification::where("read_by","admin")->count();
+        $notes = Notification::where("read_by","admin")->get();
 
-        return view('paymentverify', compact('payments', 'requests', 'users'));
+        return view('paymentverify', compact('payments', 'requests', 'users','noteCount','notes'));
     }
 
    
@@ -36,12 +40,34 @@ class PaymentController extends Controller
     if ($request->amount_paid != $expectedAmount) {
         return back()->with('error', 'Amount does not match request amount!');
     }
+
     $payment->update([
         'referrence_number' => $request->referrence_number,
         'amount_paid'       => $request->amount_paid,
         'status'            => 'confirmed',
-        'verified_by'       => 2, 
+        'verified_by'       => 2,
     ]);
+    $user = SystemUser::find($payment->request->requested_by);
+
+    if ($user && $user->email) {
+
+        Mail::raw(
+            "Hello {$user->first_name} {$user->last_name},
+
+Your payment has been verified successfully.
+
+Reference Number: {$payment->referrence_number}
+Amount Paid: " . number_format($payment->amount_paid) . " TZS
+
+Your fuel Vouchar is now generated and ready for the next process.
+
+Thank you.",
+            function ($message) use ($user) {
+                $message->to($user->email)
+                        ->subject('Payment Verification Successful');
+            }
+        );
+    }
 
     
     Voucher::create([
@@ -70,6 +96,11 @@ class PaymentController extends Controller
         'amount_paid'       => $request->amount_paid,
         'status'            => 'pending',
         'verified_by'       => 2, 
+    ]);
+    Notification::create([
+        "title" => "Payment alert",
+        "action" => "Customer ".Auth::guard('web')->user()->first_name." ".Auth::guard('web')->user()->last_name." has made payment",
+        "read_by" => "admin"
     ]);
 
     return back()->with('success', 'Payment submitted successfully');

@@ -257,17 +257,17 @@ Fuel attendant
    class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
 
     <i class="bi bi-journal-text"></i>
-    <span>User Requests</span>
+    <span>Fuel Requests</span>
 
 </a>
 
-<a href="{{ route('payments.index') }}"
+{{-- <a href="{{ route('payments.index') }}"
    class="{{ request()->routeIs('payments.*') ? 'active' : '' }}">
 
     <i class="bi bi-cash-stack"></i>
     <span>Payments Info</span>
 
-</a>
+</a> --}}
 
 <a href="#"
    class="">
@@ -306,14 +306,15 @@ Fuel attendant
     <span>Registration</span>
 
 </a>
+<a href="{{ route('generated') }}"
+   class="{{ request()->routeIs('generated') ? 'active' : '' }}">
 
-<a href="{{ route('userRequest.index') }}"
-   class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
-
-    <i class="bi bi-file-earmark-plus-fill"></i>
-    <span>Make Request</span>
+    <i class="bi bi-ticket-detailed-fill"></i>
+    <span>Generated Voucher</span>
 
 </a>
+
+
 
 <a href="#"
    class="">
@@ -341,7 +342,14 @@ Fuel attendant
    class="{{ request()->routeIs('vouchers.*') ? 'active' : '' }}">
 
     <i class="bi bi-ticket-perforated-fill"></i>
-    <span>Vouchers Info</span>
+    <span>Assign Voucher</span>
+
+</a>
+<a href="{{ route('userRequest.index') }}"
+   class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
+
+    <i class="bi bi-file-earmark-plus-fill"></i>
+    <span>Fuel Request</span>
 
 </a>
 
@@ -498,16 +506,17 @@ Fuel attendant
     </div>
 
     <!-- Notification -->
-   
+    @if(Auth::guard("web")->user()->role == "admin")
     <div class="dropdown">
         <button class="btn position-relative" data-bs-toggle="dropdown">
             <i class="bi bi-bell fs-5"></i>
 
             <!-- Badge -->
-          
+             @if($noteCount > 0)
               <span class="position-absolute badge rounded-pill bg-danger" style="margin-left: -13px">
-                9
+                {{ $noteCount }}
             </span>
+            @endif
                 
            
         </button>
@@ -517,7 +526,7 @@ Fuel attendant
     
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h6 class="mb-0">Notifications</h6>
-        <form action="" method="POST">
+        <form action="{{ route('delete_all') }}" method="POST">
             @csrf
             @method('DELETE')
             <button class="btn btn-sm btn-danger">
@@ -529,17 +538,22 @@ Fuel attendant
     <!-- Scrollable area -->
     <div id="notificationList" style="max-height:300px; overflow-y:auto;">
 
-        
+        @foreach ($notes as $note) 
         <div class="border-bottom mb-2">
-            <p class="mb-1 fw-bold">Hey me again</p>
-            <p class="mb-1">I want to build a system</p>
-            <small class="text-muted">8min ago</small>
+            <p class="mb-1 fw-bold">{{ $note->title }}</p>
+            <p class="mb-1">{{$note->action}}</p>
+            <small class="text-muted">{{ $note->created_at->diffForHumans() }}</small>
         </div>
+        @endforeach
+
+
+        
         
 
     </div>
 </div>
     </div>
+    @endif
         
     
 

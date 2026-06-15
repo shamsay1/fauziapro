@@ -46,123 +46,58 @@
     </style>
 @section("content")
 <div class="content">
-<div class="table-container">
-<div class="voucher-card">
-
-    <!-- HEADER -->
     <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#generateVoucherModal">
-    + Generate Voucher
+    + Assign Voucher
 </button>
-    <div class="voucher-header text-center">
-        <h3>FUEL VOUCHER</h3>
-        <p class="mb-0">Official Payment Voucher</p>
-    </div>
+<div class="table-container">
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Company Name</th>
+            <th>Vouchar Code</th>
+            <th>Fuel balanced</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
 
-    <hr>
-
-    <!-- INFO -->
-  <div class="row">
-
-@forelse($vouchers as $voucher)
-
-
-<div class="voucher-card p-4" style="border:1px solid #ddd; border-radius:12px; background:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-
-    <!-- HEADER -->
-    <div class="text-center mb-3">
-        <h4 style="margin:0;">FUEL VOUCHER</h4>
-        <small class="text-muted">Official Payment Receipt</small>
-    </div>
-
-    <hr>
-
-    <!-- ROW 1 -->
-    <div class="row mb-2">
-        <div class="col-md-6">
-            <div class="info-box">
-                <b>Customer</b><br>
-                {{ $voucher->request->user->first_name }}
-                {{ $voucher->request->user->last_name }}
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="info-box">
-                <b>Organization</b><br>
-                {{ $voucher->request->user->organization->company_name ?? 'N/A' }}
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 2 -->
-    <div class="row mb-2">
-        <div class="col-md-6">
-            <div class="info-box">
-                <b>Voucher Code</b><br>
-                {{ $voucher->voucher_code }}
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="info-box">
-                <b>Amount Paid</b><br>
-                {{ number_format($voucher->amount) }} TZS
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 3 -->
-    <div class="row mb-2">
-        <div class="col-md-6">
-            <div class="info-box">
-                <b>Fuel Litres</b><br>
-                {{ round($voucher->amount / 3000, 2) }} L
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="info-box">
-                <b>Status</b><br>
+    <tbody>
+        @php
+            $index = 0;
+        @endphp
+        @forelse($vouchers as $voucher)
+        <tr>
+            <td>{{ $index + 1 }}</td>
+            <td>{{ $voucher->request->user->organization->company_name ?? 'N/A' }}</td>
+            <td>{{ $voucher->voucher_code }}</td>
+            <td>{{ round($voucher->amount / 3000, 2) }} L</td>
+            <td>
                 @if($voucher->status == 'unused')
-                    <span class="badge bg-success">UNUSED</span>
+                    <span class="badge bg-success">Not finish</span>
                 @else
-                    <span class="badge bg-danger">USED</span>
+                    <span class="badge bg-danger">Finished</span>
                 @endif
-            </div>
-        </div>
-    </div>
+            </td>
 
-    <!-- ROW 4 -->
-    <div class="row mb-3">
-        <div class="col-md-12">
-            <div class="info-box">
-                <b>Expiry Date</b><br>
-                {{ $voucher->expiry_date }}
-            </div>
-        </div>
-    </div>
+            <td>
+                <a href="{{ route('vouchers.show1', $voucher->id) }}"
+                class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye"></i> 
+                </a>
+                
+            </td>
+        </tr>
 
-    <hr>
+        
 
-    <!-- QR CODE BIG -->
-    <div class="text-center">
-        <div style="background:#fff; padding:15px; display:inline-block; border-radius:10px;">
-            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(200)->generate($voucher->voucher_code) !!}
-        </div>
-        <p class="mt-2 text-muted">Scan QR to verify voucher</p>
-    </div>
-
-</div>
-
-</div>
-
-@empty
-    <div class="col-12">
-        <p class="text-center">No vouchers found</p>
-    </div>
-@endforelse
-
-</div>
+        @empty
+        <tr>
+            <td colspan="4" class="text-center">No Data Found</td>
+        </tr>
+        @endforelse
+    </tbody>
+</table>
 
 <div class="modal fade" id="generateVoucherModal" tabindex="-1">
   <div class="modal-dialog">
@@ -172,7 +107,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Generate Voucher</h5>
+                <h5 class="modal-title">Assign Voucher</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -191,11 +126,15 @@
                     </select>
                 </div>
 
-                <!-- AMOUNT -->
-                <div class="mb-3">
-                    <label>Amount (TZS)</label>
-                    <input type="number" name="amount" class="form-control" required>
-                </div>
+                <!-- LITRES -->
+<div class="mb-3">
+    <label>Fuel Litres</label>
+    <input type="number"
+           name="litres"
+           class="form-control"
+           min="1"
+           required>
+</div>
 
             </div>
 
@@ -213,7 +152,7 @@
 <hr>
 <p>
     @if(session('error'))
-    <span>{{ session('error') }}</span>
+    <span style="color: red;text-align: center">{{ session('error') }}</span>
     @endif
 </p>
 <p class="text-center text-muted">

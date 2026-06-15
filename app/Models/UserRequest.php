@@ -16,5 +16,9 @@ class UserRequest extends Model
     {
         return $this->belongsTo(SystemUser::class, 'requested_by');
     }
+    public function payment()
+{
+    return $this->hasOne(Payment::class, 'request_id');
+}
     
 }

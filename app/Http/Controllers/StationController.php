@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Station;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,9 @@ class StationController extends Controller
     public function index()
     {
         $stations = Station::all();
-        return view('stationinfo', compact('stations'));
+        $noteCount = Notification::where("read_by","admin")->count();
+        $notes = Notification::where("read_by","admin")->get();
+        return view('stationinfo', compact('stations','noteCount','notes'));
     }
     public function store(Request $request)
     {

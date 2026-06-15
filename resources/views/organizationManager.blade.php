@@ -83,7 +83,7 @@
 
                                 @else
                                 <option value="">Select Role</option>
-                                <option value="manager">Manager</option>
+                                <option value="manager">Organization Manager</option>
                                 <option value="station_manager">Fuel station Manager</option>
                                 <option value="attendant">Fuel attendant</option>
                                 @endif
@@ -171,7 +171,7 @@
 
                 <option value="manager"
                     {{ request('role') == 'manager' ? 'selected' : '' }}>
-                    Manager
+                    Organization Manager
                 </option>
 
                 <option value="accountant"
@@ -273,6 +273,7 @@
             <th>Email</th>
             <th>Role</th>
             <th>Organization</th>
+            <th>User Status</th>
             <th>Station</th>
             <th>Action</th>
 
@@ -306,6 +307,15 @@
             <td style="text-align: center">
                 {{ $user->organization->company_name ?? 'N/A' }}
             </td>
+            <td style="text-align: center">
+                @if ($user->status == "Active")
+                    <span class="badge bg-success">{{ $user->status }}</span>
+                @else
+                    <span class="badge bg-danger">{{ $user->status }}</span>
+
+                @endif
+                
+            </td>
 
             <td style="text-align: center">
                 {{ $user->station->station_name ?? '-' }}
@@ -313,21 +323,107 @@
 
             <td>
 
-                <button class="btn btn-primary btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#edit{{ $user->id }}">
-
-                    <i class="bi bi-pencil-square"></i>
-
-                </button>
-                <button class="btn btn-danger btn-sm">
-
-        <i class="bi bi-slash-circle" title="Block user"></i>
-
+    <button class="btn btn-primary btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#edit{{ $user->id }}">
+        <i class="bi bi-pencil-square"></i>
     </button>
 
-            </td>
+    @if($user->status == 'active')
+        <a href="{{ route('users.toggle-status',$user->id) }}"
+           class="btn btn-danger btn-sm"
+           onclick="return confirm('Block this user?')">
 
+            <i class="bi bi-slash-circle"></i>
+        </a>
+    @else
+        <a href="{{ route('users.toggle-status',$user->id) }}"
+           class="btn btn-success btn-sm"
+           onclick="return confirm('Block/Unblock this user?')">
+
+            <i class="bi bi-check-circle"></i>
+        </a>
+    @endif
+
+</td>
+<div class="modal fade" id="edit{{ $user->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form action="{{ route('users.update',$user->id) }}"
+                  method="POST">
+
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Edit User
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-2">
+                        <label>First Name</label>
+                        <input type="text"
+                               name="first_name"
+                               class="form-control"
+                               value="{{ $user->first_name }}">
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Last Name</label>
+                        <input type="text"
+                               name="last_name"
+                               class="form-control"
+                               value="{{ $user->last_name }}">
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Email</label>
+                        <input type="email"
+                               name="email"
+                               class="form-control"
+                               value="{{ $user->email }}">
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Phone</label>
+                        <input type="text"
+                               name="phone"
+                               class="form-control"
+                               value="{{ $user->mobile }}">
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Role</label>
+                        <select name="role" class="form-control">
+                            <option value="user" {{ $user->role=='manager'?'selected':'' }}>Organization Manager</option>
+                            <option value="station_manager" {{ $user->role=='station_manager'?'selected':'' }}>Station Manager</option>
+                            <option value="accountant" {{ $user->role=='accountant'?'selected':'' }}>Accountant</option>
+                            <option value="admin" {{ $user->role=='admin'?'selected':'' }}>Admin</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success">
+                        Update User
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
         </tr>
 
         @empty
