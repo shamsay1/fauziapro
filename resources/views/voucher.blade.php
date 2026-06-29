@@ -54,9 +54,9 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>Company Name</th>
+            {{-- <th>Company Name</th> --}}
             <th>Vouchar Code</th>
-            <th>Fuel balanced</th>
+            <th>Litre(s)</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
@@ -69,9 +69,9 @@
         @forelse($vouchers as $voucher)
         <tr>
             <td>{{ $index + 1 }}</td>
-            <td>{{ $voucher->request->user->organization->company_name ?? 'N/A' }}</td>
+            {{-- <td>{{ $voucher->request->user->organization->company_name ?? 'N/A' }}</td> --}}
             <td>{{ $voucher->voucher_code }}</td>
-            <td>{{ round($voucher->amount / 3000, 2) }} L</td>
+            <td>{{ round($voucher->amount / 3000, 2) }}</td>
             <td>
                 @if($voucher->status == 'unused')
                     <span class="badge bg-success">Not finish</span>

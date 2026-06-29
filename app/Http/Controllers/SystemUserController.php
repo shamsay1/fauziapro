@@ -30,11 +30,11 @@ class SystemUserController extends Controller
     }
 
     // MANAGER
-    elseif (Auth::guard('web')->user()->role == "manager") {
+    elseif (Auth::guard('web')->user()->role == "accountant") {
 
         $query->where(function ($q) {
 
-            $q->where('role', 'accountant')
+            $q->where('role', 'manager')
               ->orWhere('role', 'driver');
 
         })
@@ -218,11 +218,37 @@ class SystemUserController extends Controller
         $voucher = VoucherAssignment::where('status','pending')->where('driver_id',$user)->first();
         return view("generated",compact('voucher'));
     }
-    public function expired(){
-        $user = Auth::guard('web')->user()->id;
-        $voucher = VoucherAssignment::with('voucher_verify.station')->where('status','expired')->where('driver_id',$user)->get();
-        return view("expired_vochar",compact('voucher'));
+    public function expired()
+{
+    $user = Auth::guard('web')->user();
+
+    if ($user->role == "accountant") {
+
+        $voucher = VoucherAssignment::with([
+                'voucher_verify.station',
+                'driver.organization'
+            ])
+            ->where('status', 'expired')
+            ->whereHas('driver', function ($query) use ($user) {
+                $query->where('organization_id', $user->organization_id);
+            })
+            ->latest()
+            ->get();
+
+    } else {
+
+        $voucher = VoucherAssignment::with([
+                'voucher_verify.station',
+                'driver.organization'
+            ])
+            ->where('status', 'expired')
+            ->where('driver_id', $user->id)
+            ->latest()
+            ->get();
     }
+
+    return view('expired_vochar', compact('voucher'));
+}
     public function verifyVoucher(Request $request)
 {
     $request->validate([
@@ -257,10 +283,10 @@ class SystemUserController extends Controller
     {  
         if(Auth::guard('web')->user()->role=="admin"){
         $users = SystemUser::with('organization')->latest()->where('role','!=','admin')->get();
-        }elseif(Auth::guard('web')->user()->role=="manager"){
+        }elseif(Auth::guard('web')->user()->role=="accountant"){
         $users = SystemUser::with('organization')
     ->where(function($query){
-        $query->where('role', 'accountant')
+        $query->where('role', 'manager')
               ->orWhere('role', 'driver');
     })
     ->where('organization_id', Auth::guard('web')->user()->organization_id)

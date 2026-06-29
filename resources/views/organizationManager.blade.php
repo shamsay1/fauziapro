@@ -83,7 +83,7 @@
 
                                 @else
                                 <option value="">Select Role</option>
-                                <option value="manager">Organization Manager</option>
+                                <option value="accountant">Accountant</option>
                                 <option value="station_manager">Fuel station Manager</option>
                                 <option value="attendant">Fuel attendant</option>
                                 @endif

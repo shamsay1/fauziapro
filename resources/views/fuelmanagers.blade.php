@@ -135,7 +135,7 @@
         @forelse($staff as $index => $user)
         <tr>
             <td>{{ $index + 1 }}</td>
-            <td>{{ $user->firstname }} {{ $user->lastname }}</td>
+            <td>{{ $user->first_name }} {{ $user->last_name }}</td>
             <td>{{ $user->mobile }}</td>
             <td>{{ $user->email }}</td>
             <td>{{ $user->station->station_name ?? 'N/A' }}</td>

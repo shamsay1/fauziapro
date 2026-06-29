@@ -46,6 +46,12 @@
                 <h5>Add Request</h5>
                 <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            <table class="table table-bordered mt-3" style="width: 400px;margin-left: 10px">
+                <tr>
+                    <td>1 liter</td>
+                    <td>3000 Tzs</td>
+                </tr>
+            </table>
 
             <form action="{{ route('userRequest.store') }}" method="POST">
                 @csrf
@@ -92,7 +98,9 @@
     <thead class="table-dark">
         <tr>
             <th>#</th>
+            @if(Auth::guard('web')->user()->role != "accountant")
             <th>Organization</th>
+            @endif
             <th>Requested Amount</th>
             <th>Litre(s)</th>
             <th>Requested Date</th>
@@ -110,17 +118,19 @@
         <tr>
 
             <td>{{ $index + 1 }}</td>
+            @if(Auth::guard('web')->user()->role != "accountant")
 
             <td>
                 {{ $req->user->organization->company_name ?? 'N/A' }}
             </td>
+            @endif
 
             <td class="text-end">
                 {{ number_format($req->request_amount) }}
             </td>
 
             <td class="text-end">
-                {{ number_format($req->number_of_litre) }} Litres
+                {{ number_format($req->number_of_litre) }}
             </td>
 
             <td>
@@ -171,13 +181,24 @@
 
             <td>
 
+                @if($req->status=="pending")
+
                 <button class="btn btn-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#payment{{ $req->id }}" disabled>
+
+                        Pay Now
+
+                    </button>
+                    @else
+                    <button class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#payment{{ $req->id }}">
 
                         Pay Now
 
                     </button>
+                    @endif
             </td>
             @endif
             @if(Auth::guard('web')->user()->role == "admin")

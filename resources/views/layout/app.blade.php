@@ -299,13 +299,7 @@ Fuel attendant
 
 </a>
 
-<a href="{{ route('index1') }}"
-   class="">
 
-    <i class="bi bi-person-plus-fill"></i>
-    <span>Registration</span>
-
-</a>
 <a href="{{ route('generated') }}"
    class="{{ request()->routeIs('generated') ? 'active' : '' }}">
 
@@ -337,6 +331,13 @@ Fuel attendant
     <span>Dashboard</span>
 
 </a>
+<a href="{{ route('index1') }}"
+   class="">
+
+    <i class="bi bi-person-plus-fill"></i>
+    <span>Registration</span>
+
+</a>
 
 <a href="{{ route('vouchers.show') }}"
    class="{{ request()->routeIs('vouchers.*') ? 'active' : '' }}">
@@ -350,6 +351,20 @@ Fuel attendant
 
     <i class="bi bi-file-earmark-plus-fill"></i>
     <span>Fuel Request</span>
+
+</a>
+<a href="#"
+   class="">
+
+    <i class="bi bi-file-earmark-plus-fill"></i>
+    <span>Payment history</span>
+
+</a>
+<a href="{{ route('expired') }}"
+   class="{{ request()->routeIs('expired') ? 'active' : '' }}">
+
+    <i class="bi bi-file-earmark-plus-fill"></i>
+    <span>Vouchar history</span>
 
 </a>
 

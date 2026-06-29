@@ -76,9 +76,9 @@
 
                         <div class="col-md-6 mb-2">
                             <select name="role" class="form-control">
-                                @if(Auth::guard('web')->user()->role=="manager")
+                                @if(Auth::guard('web')->user()->role=="accountant")
                                 <option value="">Select Role</option>
-                                <option value="accountant">Accountant</option>
+                                <option value="manager">Manager</option>
                                 <option value="driver">Driver</option>
 
                                 @else
@@ -90,7 +90,7 @@
                             </select>
                         </div>
                     </div>
-                @if(Auth::guard('web')->user()->role=="manager")
+                @if(Auth::guard('web')->user()->role=="accountant")
                 <input type="hidden" name="organization_id" value="{{ Auth::guard('web')->user()->organization_id }}">
                 @else
                   <div class="row">
@@ -292,9 +292,9 @@
                                                     Manager
                                                 </option>
 
-                                                <option value="staff"
-                                                    {{ $user->role == 'staff' ? 'selected' : '' }}>
-                                                    Staff
+                                                <option value="driver"
+                                                    {{ $user->role == 'driver' ? 'selected' : '' }}>
+                                                    Driver
                                                 </option>
                                             </select>
                                         </div>
