@@ -50,6 +50,7 @@
                 <tr>
                     <td>1 liter</td>
                     <td>3000 Tzs</td>
+                    <td id="amount1"></td>
                 </tr>
             </table>
 
@@ -67,6 +68,16 @@
                         <div class="col-md-12 mb-2">
                             <label>Amount</label>
                             <input type="text" id="amount" name="request_amount" class="form-control" placeholder="Amount" readonly>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label>Fuel Company</label>
+                            <select name="organization_id" class="form-select">
+                                <option value="">Select fuel company</option>
+                                @foreach ($organizations as $org)
+                                <option value="{{ $org->id }}">{{ $org->company_name }}</option>
+                                    
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
@@ -201,7 +212,7 @@
                     @endif
             </td>
             @endif
-            @if(Auth::guard('web')->user()->role == "admin")
+            @if(Auth::guard('web')->user()->role == "subadmin")
 <td>
 
     {{-- APPROVE / DISAPPROVE REQUEST --}}
@@ -219,7 +230,7 @@
     </button>
 @endif
 
-            @if(Auth::guard('web')->user()->role == "admin")
+            @if(Auth::guard('web')->user()->role == "subadmin")
 
                 @if($req->payment && $req->payment->status == 'pending')
 
@@ -235,6 +246,63 @@
             @endif
 
         </tr>
+        <!-- Verify Payment Modal -->
+<div class="modal fade" id="verify{{ $req->payment->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Verify Payment</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form action="{{ route('payments.verify', $req->payment->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Reference Number</label>
+                        <input type="text"
+                               name="referrence_number"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Amount Paid</label>
+                        <input type="number"
+                               name="amount_paid"
+                               class="form-control"
+                               value="{{ $req->request_amount }}"
+                               required>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Confirmation</strong><br>
+                        Are you sure you want to verify this payment?
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        Confirm Verification
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
          <div class="modal fade" id="payment{{ $req->id }}" tabindex="-1">
 
             <div class="modal-dialog">
@@ -271,7 +339,7 @@
                                 </label>
 
                                 <input type="text"
-                                    name="referrence_number"
+                                    name="amount_paid"
                                     class="form-control"
                                     value="{{ $req->request_amount }}"
                                     required>
@@ -285,7 +353,7 @@
                                 </label>
 
                                 <input type="number"
-                                    name="amount_paid"
+                                    name="referrence_number"
                                     class="form-control"
                                     required>
 
@@ -510,6 +578,7 @@
 <script>
     const litreInput = document.getElementById('litre');
     const amountInput = document.getElementById('amount');
+    const amount1 = document.getElementById('amount1');
 
     litreInput.addEventListener('input', function () {
         let litre = parseFloat(this.value);
@@ -517,6 +586,7 @@
         if (!isNaN(litre)) {
             let amount = litre * 3000;
             amountInput.value = amount;
+            amount1.value=amount;
         } else {
             amountInput.value = '';
         }

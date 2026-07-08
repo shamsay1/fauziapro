@@ -8,6 +8,7 @@ class Station extends Model
 {
     protected $fillable = [
         "station_name",
-        "location"
+        "location",
+        "organization_id"
     ];
 }

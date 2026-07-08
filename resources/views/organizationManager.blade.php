@@ -61,7 +61,7 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-2">
-                            <input type="text" name="mobile" class="form-control" placeholder="Mobile" required>
+                            <input type="text" name="mobile" class="form-control" maxlength="10" placeholder="Mobile" required>
                         </div>
 
                         <div class="col-md-6 mb-2">
@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="col-md-6 mb-2">
-                            <select name="role" class="form-control">
+                            <select name="role" id="role" class="form-control">
                                 @if(Auth::guard('web')->user()->role=="manager")
                                 <option value="">Select Role</option>
                                 <option value="accountant">Accountant</option>
@@ -83,6 +83,7 @@
 
                                 @else
                                 <option value="">Select Role</option>
+                                <option value="subadmin">Sub Admin</option>
                                 <option value="accountant">Accountant</option>
                                 <option value="station_manager">Fuel station Manager</option>
                                 <option value="attendant">Fuel attendant</option>
@@ -94,26 +95,29 @@
                 <input type="hidden" name="organization_id" value="{{ Auth::guard('web')->user()->organization_id }}">
                 @else
                   <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <select name="organization_id" class="form-control">
-                            <option value="">Select Organization</option>
-                            @foreach($organizations as $org)
-                                <option value="{{ $org->id }}">
-                                    {{ $org->company_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <select name="station_id" class="form-control">
-                            <option value="">Select station</option>
-                            @foreach($stations as $st)
-                                <option value="{{ $st->id }}">
-                                    {{ $st->station_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <div class="row">
+    <div class="col-md-6 mb-2">
+        <select name="organization_id" class="form-control">
+            <option value="">Select Organization</option>
+            @foreach($organizations as $org)
+                <option value="{{ $org->id }}">
+                    {{ $org->company_name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="col-md-6 mb-2" id="stationDiv">
+        <select name="station_id" class="form-control">
+            <option value="">Select Station</option>
+            @foreach($stations as $st)
+                <option value="{{ $st->id }}">
+                    {{ $st->station_name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+</div>
                     </div>
                     @endif
 
@@ -159,7 +163,10 @@
                 <option value="">
                     -- Select Role --
                 </option>
-
+                 <option value="subadmin"
+                    {{ request('role') == 'subadmin' ? 'selected' : '' }}>
+                    Subadmin
+                </option>
                 <option value="station_manager"
                     {{ request('role') == 'station_manager' ? 'selected' : '' }}>
                     Station Manager
@@ -396,7 +403,7 @@
                     <div class="mb-2">
                         <label>Phone</label>
                         <input type="text"
-                               name="phone"
+                               name="mobile"
                                class="form-control"
                                value="{{ $user->mobile }}">
                     </div>
@@ -405,6 +412,7 @@
                         <label>Role</label>
                         <select name="role" class="form-control">
                             <option value="user" {{ $user->role=='manager'?'selected':'' }}>Organization Manager</option>
+                            <option value="subadmin" {{ $user->role=='subadmin'?'selected':'' }}>Sub Admin</option>
                             <option value="station_manager" {{ $user->role=='station_manager'?'selected':'' }}>Station Manager</option>
                             <option value="accountant" {{ $user->role=='accountant'?'selected':'' }}>Accountant</option>
                             <option value="admin" {{ $user->role=='admin'?'selected':'' }}>Admin</option>
@@ -446,5 +454,26 @@
 
 </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
+    const role = document.getElementById('role');
+    const stationDiv = document.getElementById('stationDiv');
+
+    function toggleStation() {
+
+        if (role.value === 'subadmin' || role.value === 'accountant') {
+            stationDiv.style.display = 'none';
+            stationDiv.querySelector('select').value = '';
+        } else {
+            stationDiv.style.display = 'block';
+        }
+    }
+
+    toggleStation(); // wakati page inafunguka
+
+    role.addEventListener('change', toggleStation);
+
+});
+</script>
 @endsection

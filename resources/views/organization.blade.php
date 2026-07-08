@@ -56,10 +56,14 @@
                         </div>
 
                         <div class="col-md-6 mb-2">
-                            <label for="">Organization Type</label>
-                            <input type="text" name="type" class="form-control" placeholder="Type" required>
-                            
-                        </div>
+    <label for="type">Organization Type</label>
+
+    <select name="type" id="type" class="form-control" required>
+        <option value="">-- Select Organization Type --</option>
+        <option value="fuelcamp">Fuel Company</option>
+        <option value="other">Other</option>
+    </select>
+</div>
                     </div>
 
                 </div>
@@ -103,15 +107,30 @@
             <td>{{ $gapco->company_name }}</td>
             <td>{{ $gapco->type }}</td>
 
-            <td>
-                <!-- EDIT BUTTON -->
-                <button class="btn btn-primary btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#edit{{ $gapco->id }}">
-                    <i class="bi bi-pencil-square"></i>
-                    
-                </button>
-            </td>
+            <td class="d-flex gap-1">
+
+    <!-- EDIT BUTTON -->
+    <button class="btn btn-primary btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#edit{{ $gapco->id }}">
+        <i class="bi bi-pencil-square"></i>
+    </button>
+
+    <!-- DELETE BUTTON -->
+    <form action="{{ route('gapcos.destroy', $gapco->id) }}"
+          method="POST"
+          onsubmit="return confirm('Una uhakika unataka kufuta kampuni hii?')">
+
+        @csrf
+        @method('DELETE')
+
+        <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash"></i>
+        </button>
+
+    </form>
+
+</td>
         </tr>
 
         <!-- EDIT MODAL -->

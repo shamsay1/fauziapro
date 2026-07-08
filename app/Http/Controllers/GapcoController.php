@@ -49,4 +49,13 @@ class GapcoController extends Controller
 
         return back()->with('success', 'Company updated successfully');
     }
+    public function destroy($id)
+{
+    $gapco = Gapco::findOrFail($id);
+
+    $gapco->delete();
+
+    return redirect()->back()
+        ->with('success', 'Company deleted successfully.');
+}
 }

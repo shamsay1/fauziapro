@@ -229,13 +229,7 @@ Fuel attendant
 
 </a>
 
-<a href="{{ route('stations.index') }}"
-   class="{{ request()->routeIs('stations.*') ? 'active' : '' }}">
 
-    <i class="bi bi-fuel-pump-fill"></i>
-    <span>Manage Stations</span>
-
-</a>
 
 <a href="{{ route('gapcos.index') }}"
    class="{{ request()->routeIs('gapcos.*') ? 'active' : '' }}">
@@ -269,6 +263,56 @@ Fuel attendant
 
 </a> --}}
 
+<a href="{{ route('reports.payments') }}"
+   class="">
+
+    <i class="bi bi-bar-chart-line-fill"></i>
+    <span>Reports</span>
+
+</a>
+
+<a href="#"
+   class="">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
+</a>
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "subadmin")
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
+</a>
+
+<a href="{{ route('stations.index') }}"
+   class="{{ request()->routeIs('stations.*') ? 'active' : '' }}">
+
+    <i class="bi bi-fuel-pump-fill"></i>
+    <span>Manage Stations</span>
+
+</a>
+
+
+<a href="{{ route('userRequest.index') }}"
+   class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
+
+    <i class="bi bi-journal-text"></i>
+    <span>Fuel Requests</span>
+
+</a>
+
+{{-- <a href="{{ route('payments.index') }}"
+   class="{{ request()->routeIs('payments.*') ? 'active' : '' }}">
+
+    <i class="bi bi-cash-stack"></i>
+    <span>Payments Info</span>
+
+</a> --}}
+
 <a href="#"
    class="">
 
@@ -284,6 +328,8 @@ Fuel attendant
     <span>Settings</span>
 
 </a>
+
+
 
 
 

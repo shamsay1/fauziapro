@@ -25,6 +25,32 @@ class PaymentController extends Controller
         return view('paymentverify', compact('payments', 'requests', 'users','noteCount','notes'));
     }
 
+     public function index2(Request $request)
+    {
+        $payments = collect();       // tupu mpaka user afilter
+        $totalRevenue = 0;
+        $totalTransactions = 0;
+        $filtered = false;           // kujua kama user tayari amefilter
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $filtered = true;
+
+            $payments = Payment::with(['request', 'verifier'])
+                ->whereDate('created_at', '>=', $request->start_date)
+                ->whereDate('created_at', '<=', $request->end_date)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $totalRevenue = $payments->where('status', 'confirmed')->sum('amount_paid');
+            $totalTransactions = $payments->count();
+        }
+           $noteCount = Notification::where("read_by","admin")->count();
+        $notes = Notification::where("read_by","admin")->get();
+
+        return view('report', compact(
+            'payments', 'totalRevenue', 'totalTransactions', 'filtered','noteCount','notes'
+        ));
+    }
    
     public function verify(Request $request, $id)
 {

@@ -10,7 +10,8 @@ class UserRequest extends Model
         "request_amount",
         "number_of_litre",
         "status",
-        "requested_by"
+        "requested_by",
+        "organization_id"
     ];
     public function user()
     {
@@ -19,6 +20,13 @@ class UserRequest extends Model
     public function payment()
 {
     return $this->hasOne(Payment::class, 'request_id');
+
 }
+
+    public function fuel_request(){
+   return $this->belongsTo(Gapco::class, 'organization_id', 'id');
+
+
+    }
     
 }

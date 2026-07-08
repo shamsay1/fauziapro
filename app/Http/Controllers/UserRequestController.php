@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Gapco;
 use App\Models\Notification;
 use App\Models\SystemUser;
 use App\Models\UserRequest;
@@ -13,7 +14,7 @@ class UserRequestController extends Controller
 {
     public function index()
 {
-    if(Auth::guard('web')->user()->role == "manager"){
+    if(Auth::guard('web')->user()->role == "accountant"){
 
         $requests = UserRequest::with([
             'user.organization',
@@ -26,12 +27,15 @@ class UserRequestController extends Controller
     }else{
 
         $requests = UserRequest::with([
-            'user.organization',
-            'payment'
-        ])
-        ->latest()
-        ->get();
+        'user.organization',
+        'fuel_request',
+        'payment'
+    ])
+    ->where('organization_id', Auth::guard('web')->user()->organization_id)
+    ->latest()
+    ->get();
     }
+    $organizations = Gapco::where("type","fuelcamp")->get();
 
     $users = SystemUser::all();
     $noteCount = Notification::where("read_by","admin")->count();
@@ -41,7 +45,8 @@ class UserRequestController extends Controller
         'requests',
         'users',
         'noteCount',
-        'notes'
+        'notes',
+        'organizations'
     ));
 }
 
@@ -59,6 +64,7 @@ class UserRequestController extends Controller
             'request_amount' => $request->request_amount,
             'number_of_litre' => $request->number_of_litre,
             'requested_by'   => Auth::guard('web')->user()->id,
+            'organization_id' => $request->organization_id,
             'status'         => 'pending',
         ]);
         Notification::create([

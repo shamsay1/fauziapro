@@ -89,7 +89,10 @@
         </div>
          <div class="card-custom">
             <div class="card-title">Fuel balanced</div>
-            <div class="card-value">{{ round($voucher_remain->amount/3000,2) }} L</div>
+            <div class="card-value">
+        {{ number_format(($voucher_remain?->amount ?? 0) / 3000, 2) }} litres
+
+            </div>
            
         </div>
         @elseif(Auth::guard('web')->user()->role == "driver")

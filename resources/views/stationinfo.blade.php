@@ -105,6 +105,18 @@
                     data-bs-target="#edit{{ $station->id }}">
                     <i class="bi bi-pencil-square"></i>
                 </button>
+                <form action="{{ route('stations.destroy', $station->id) }}"
+                    method="POST"
+                    style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this station?')">
+
+                    @csrf
+                    @method('DELETE')
+
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
 
                 <!-- BLOCK -->
                 {{-- <form action="{{ route('station.block', $station->id) }}" method="POST" style="display:inline;">

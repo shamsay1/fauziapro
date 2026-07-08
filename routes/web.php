@@ -20,7 +20,7 @@ Route::resource('gapcos', GapcoController::class);
 Route::resource('users', SystemUserController::class);
 Route::resource('userRequest', UserRequestController::class);
 Route::resource('payments', PaymentController::class);
-Route::post('/payments/verify/{id}', [PaymentController::class, 'verify'])->name('payments.verify');
+Route::put('/payments/verify/{id}', [PaymentController::class, 'verify'])->name('payments.verify');
 Route::get('/vouchers', [SystemUserController::class, 'index'])->name('vouchers.index');
 Route::get('/vouchers', [SystemUserController::class, 'show'])->name('vouchers.show');
 Route::get('/users_all',[SystemUserController::class,"index1"])->name("index1");
@@ -43,3 +43,7 @@ Route::get('/users/{id}/toggle-status',
 Route::delete("/delete_notes",[AdminController::class,"delete_all"])->name("delete_all");
 Route::get('/vouchers/{id}', [AdminController::class, 'show'])
     ->name('vouchers.show1');
+
+
+Route::get('/reports/payments', [PaymentController::class, 'index2'])
+    ->name('reports.payments');
