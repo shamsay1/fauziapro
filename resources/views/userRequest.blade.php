@@ -148,7 +148,7 @@
                 {{ date('d M Y H:i', strtotime($req->created_at)) }}
             </td>
 
-            <td>
+            <td class="text-center">
                 @if($req->status == 'pending')
                     <span class="badge bg-warning">Pending</span>
                 @elseif($req->status == 'approved')
@@ -158,7 +158,7 @@
                 @endif
             </td>
 
-            <td>
+            <td class="text-center">
                 @if(
                     Auth::guard('web')->user()->role == "accountant"
                     && $req->status == 'approved'
@@ -190,7 +190,7 @@
             </td>
             @if(Auth::guard('web')->user()->role == "accountant")
 
-            <td>
+            <td class="text-center">
 
                 @if($req->status=="pending")
 
@@ -213,7 +213,7 @@
             </td>
             @endif
             @if(Auth::guard('web')->user()->role == "subadmin")
-<td>
+<td class="text-center">
 
     {{-- APPROVE / DISAPPROVE REQUEST --}}
     <button class="btn btn-sm
